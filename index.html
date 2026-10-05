@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#6c5ce7">
+<title>Anglais A1 → C2 : cours et exercices</title>
+<meta name="description" content="Apprends l'anglais du niveau A1 au C2 : fiches de cours, exercices corrigés, vocabulaire et lecture.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap">
+<style>
+:root{--bg:#f5f3ff;--card:#fff;--ink:#1c1b3a;--mute:#5d5c80;--acc:#6c5ce7;--p2:#ff5ca8;--ok:#12a36a;--ko:#e5384f;--line:#e6e2fb;--sh:0 10px 30px rgba(76,60,170,.14);
+--a1:#12b886;--a2:#ff8a3d;--b1:#7c5cff;--b2:#e84393;--c1:#0984e3;--c2:#c9971c;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12112b;--card:#1d1b40;--ink:#f1efff;--mute:#aeabdb;--acc:#9d8cff;--p2:#ff7eb8;--ok:#4ade9d;--ko:#ff7b8f;--line:#2f2c5e;--sh:0 10px 30px rgba(0,0,0,.4)}}
+:root[data-theme="dark"]{--bg:#12112b;--card:#1d1b40;--ink:#f1efff;--mute:#aeabdb;--acc:#9d8cff;--p2:#ff7eb8;--ok:#4ade9d;--ko:#ff7b8f;--line:#2f2c5e;--sh:0 10px 30px rgba(0,0,0,.4)}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100vh;color:var(--ink);font:clamp(16px,1.1vw + 12px,19px)/1.6 "Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
+background:radial-gradient(900px 600px at 105% -5%,color-mix(in srgb,var(--p2) 24%,transparent),transparent 62%),radial-gradient(900px 600px at -10% 5%,color-mix(in srgb,var(--acc) 26%,transparent),transparent 62%),var(--bg)}
+.wrap{max-width:1080px;margin:auto;padding:0 20px}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--acc);outline-offset:3px;border-radius:8px}
+
+header{display:flex;align-items:center;gap:10px;padding:18px 0;font-weight:900;font-size:1.05rem}
+.logo{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;color:#fff;font-weight:900;background:linear-gradient(135deg,var(--acc),var(--p2));box-shadow:0 6px 16px rgba(108,92,231,.35)}
+
+.hero{display:grid;gap:36px;padding:28px 0 56px;align-items:center}
+h1{margin:0 0 14px;font-weight:900;letter-spacing:-.025em;line-height:1.04;font-size:clamp(2.6rem,9vw,4.8rem);
+background:linear-gradient(90deg,var(--acc),var(--p2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{font-size:1.18em;color:var(--mute);max-width:34ch;margin:0 0 26px}
+.cta{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.btn{display:inline-block;text-decoration:none;font-weight:800;border-radius:16px;padding:14px 28px;color:#fff;background:linear-gradient(135deg,var(--acc),var(--p2));box-shadow:0 8px 20px rgba(108,92,231,.38);transition:transform .15s}
+.btn:active{transform:scale(.97)}
+.btn.alt{background:var(--card);color:var(--ink);box-shadow:var(--sh)}
+
+/* démo : le moment mémorable */
+.demo{background:var(--card);border-radius:24px;padding:22px;box-shadow:var(--sh);max-width:460px;width:100%;justify-self:center;border:1px solid var(--line)}
+.demo-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;font-weight:800;font-size:.85rem;color:var(--mute)}
+.lv{color:#fff;padding:3px 14px;border-radius:99px;font-weight:800;font-size:.9rem}
+.bar{height:10px;background:var(--line);border-radius:99px;overflow:hidden;margin-bottom:18px}
+.bar i{display:block;height:100%;width:33%;background:linear-gradient(90deg,var(--acc),var(--p2));border-radius:99px;transition:width .35s}
+.demo .s{font-size:1.35rem;font-weight:800;margin:0 0 16px;min-height:2.6em}
+.opts{display:flex;flex-wrap:wrap;gap:10px}
+.opts button{font:inherit;font-weight:800;color:var(--ink);cursor:pointer;background:var(--card);border:2px solid var(--line);border-radius:14px;padding:11px 20px;box-shadow:0 3px 0 var(--line)}
+.opts button:hover:not(:disabled){border-color:var(--acc)}
+.opts button.ok{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 18%,transparent)}
+.opts button.ko{border-color:var(--ko);background:color-mix(in srgb,var(--ko) 18%,transparent)}
+.fb{min-height:3.2em;margin:14px 0 4px;font-weight:700;font-size:.95rem}
+.next{font:inherit;font-weight:800;color:var(--acc);background:none;border:0;padding:6px 0;cursor:pointer;visibility:hidden}
+.next.on{visibility:visible}
+
+h2{font-size:clamp(1.6rem,4vw,2.2rem);line-height:1.15;margin:0 0 8px;letter-spacing:-.015em}
+.sub{color:var(--mute);margin:0 0 28px;max-width:52ch}
+section{padding:36px 0}
+
+/* escalier des niveaux : c'est une vraie progression */
+.steps{display:flex;align-items:flex-end;gap:8px;height:230px}
+.steps div{flex:1;border-radius:14px 14px 6px 6px;color:#fff;padding:10px 6px;text-align:center;display:flex;flex-direction:column;justify-content:flex-start;align-items:center;gap:2px;box-shadow:var(--sh)}
+.steps b{font-size:clamp(1.1rem,3.4vw,1.7rem);font-weight:900;line-height:1.1}
+.steps small{font-size:clamp(.62rem,1.9vw,.85rem);font-weight:700;opacity:.95;line-height:1.2}
+.steps div:nth-child(1){height:34%;background:var(--a1)}.steps div:nth-child(2){height:48%;background:var(--a2)}
+.steps div:nth-child(3){height:62%;background:var(--b1)}.steps div:nth-child(4){height:76%;background:var(--b2)}
+.steps div:nth-child(5){height:88%;background:var(--c1)}.steps div:nth-child(6){height:100%;background:var(--c2)}
+
+.feats{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.f{background:var(--card);border-radius:20px;padding:22px;box-shadow:var(--sh);border:1px solid var(--line);position:relative;overflow:hidden}
+.f::before{content:"";position:absolute;left:0;top:0;bottom:0;width:7px;background:var(--c)}
+.f .ic{font-size:2rem;line-height:1;margin-bottom:10px}
+.f h3{margin:0 0 4px;font-size:1.2rem}
+.f p{margin:0 0 12px;color:var(--mute);font-size:.95em}
+.f strong{display:inline-block;font-size:.85rem;padding:2px 12px;border-radius:99px;color:var(--c);background:color-mix(in srgb,var(--c) 16%,transparent)}
+
+.band{margin:28px 0 20px;border-radius:28px;padding:clamp(26px,5vw,48px);text-align:center;color:#fff;background:linear-gradient(135deg,#6c5ce7,#ff5ca8);box-shadow:0 14px 34px rgba(108,92,231,.4)}
+.band h2{margin-bottom:8px}.band p{margin:0 auto 22px;max-width:44ch;opacity:.95}
+.band .btn{background:#fff;color:#4b3bc4;box-shadow:0 8px 20px rgba(0,0,0,.2)}
+footer{padding:20px 0 40px;text-align:center;color:var(--mute);font-size:.9rem}
+
+@media (min-width:860px){.hero{grid-template-columns:1.1fr .9fr;padding:48px 0 72px}.steps{height:290px;gap:12px}}
+@media (min-width:600px) and (max-width:859px){.hero{padding-top:40px}.lead{max-width:42ch}}
+@media (prefers-reduced-motion:no-preference){.demo{animation:in .7s ease-out both}@keyframes in{from{opacity:0;transform:translateY(14px)}}}
+</style></head><body>
+<div class="wrap">
+<header><span class="logo" aria-hidden="true">En</span>English A1 → C2</header>
+
+<main>
+<div class="hero">
+ <div>
+  <h1>Anglais<br>A1 → C2</h1>
+  <p class="lead">Cours, exercices corrigés, vocabulaire et lecture. Avance niveau par niveau, à ton rythme.</p>
+  <div class="cta"><a class="btn" href="index.html">Commencer</a><a class="btn alt" href="#niveaux">Voir les niveaux</a></div>
+ </div>
+
+ <div class="demo" aria-label="Exemple d'exercice">
+  <div class="demo-top"><span class="lv" id="dl">A1</span><span id="dc">Exemple 1 / 3</span></div>
+  <div class="bar"><i id="db"></i></div>
+  <p class="s" id="dq"></p>
+  <div class="opts" id="do"></div>
+  <p class="fb" id="df" aria-live="polite"></p>
+  <button class="next" id="dn">Question suivante</button>
+ </div>
+</div>
+
+<section id="niveaux">
+ <h2>Six niveaux, une seule appli</h2>
+ <p class="sub">Du premier « I am » aux nuances du C2. Chaque niveau a ses fiches, ses séries et son test mixte.</p>
+ <div class="steps" role="img" aria-label="Escalier des niveaux A1, A2, B1, B2, C1, C2">
+  <div><b>A1</b><small>Débutant</small></div><div><b>A2</b><small>Élémentaire</small></div>
+  <div><b>B1</b><small>Intermédiaire</small></div><div><b>B2</b><small>Avancé</small></div>
+  <div><b>C1</b><small>Autonome</small></div><div><b>C2</b><small>Maîtrise</small></div>
+ </div>
+</section>
+
+<section>
+ <h2>Tout ce qu'il faut pour progresser</h2>
+ <p class="sub">Lis la règle, entraîne-toi, retiens les mots, puis lis de vrais textes.</p>
+ <div class="feats">
+  <article class="f" style="--c:var(--acc)"><div class="ic">📘</div><h3>Théorie</h3><p>Des fiches claires avec règles, tableaux et exemples.</p><strong>37 fiches</strong></article>
+  <article class="f" style="--c:var(--p2)"><div class="ic">✏️</div><h3>Exercices</h3><p>Corrigés tout de suite, avec un test mixte par niveau.</p><strong>37 séries</strong></article>
+  <article class="f" style="--c:var(--a1)"><div class="ic">🗂️</div><h3>Vocabulaire</h3><p>Des mots classés par thème, à réviser en quiz.</p><strong>815 mots</strong></article>
+  <article class="f" style="--c:var(--c1)"><div class="ic">📖</div><h3>Lecture</h3><p>Des textes à écouter, suivis de questions de compréhension.</p><strong>30 textes</strong></article>
+ </div>
+</section>
+
+<div class="band">
+ <h2>Prêt à t'y mettre ?</h2>
+ <p>Gratuit, sans compte. Ta progression reste enregistrée sur ton appareil.</p>
+ <a class="btn" href="index.html">Commencer</a>
+</div>
+</main>
+<footer>Fonctionne sur téléphone, tablette et ordinateur.</footer>
+</div>
+
+<script>
+const Q=[["A1","I ___ from Belgium.",["am","is","are"],0,"On dit « I am » avec je."],
+["A2","Look! It ___.",["rains","is raining"],1,"Ça se passe maintenant : présent continu."],
+["B1","If I ___ rich, I would travel.",["am","were","will be"],1,"Condition irréelle : on utilise « were »."]];
+const C={A1:"var(--a1)",A2:"var(--a2)",B1:"var(--b1)"};
+let i=0;
+const $=id=>document.getElementById(id);
+function show(){
+ const [l,q,o,r]=Q[i];
+ $('dl').textContent=l;$('dl').style.background=C[l];
+ $('dc').textContent="Exemple "+(i+1)+" / 3";$('db').style.width=((i+1)/3*100)+"%";
+ $('dq').textContent=q;$('df').textContent="";$('dn').classList.remove('on');
+ $('do').innerHTML="";
+ o.forEach((t,k)=>{const b=document.createElement('button');b.textContent=t;
+  b.onclick=()=>{[...$('do').children].forEach((x,j)=>{x.disabled=true;if(j===r)x.classList.add('ok')});
+   if(k!==r)b.classList.add('ko');
+   $('df').textContent=(k===r?"Bravo ! ":"Pas tout à fait. ")+Q[i][4];
+   $('dn').classList.add('on');$('dn').textContent=i<2?"Question suivante":"Recommencer";};
+  $('do').appendChild(b)});
+}
+$('dn').onclick=()=>{i=(i+1)%3;show()};
+show();
+</script>
+</body></html>
