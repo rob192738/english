@@ -39,12 +39,13 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--acc);outline-of
 .th .warn{border-left:5px solid var(--ko)}.th .tip{border-left:5px solid var(--ok)}
 .th ul{padding-left:20px;margin:6px 0}.en{color:var(--acc);font-weight:700}
 .rv .k{color:var(--ko);font-weight:700}.rv .g{color:var(--ok);font-weight:700}.rv summary{cursor:pointer;color:var(--acc);font-weight:700;margin-top:10px}.rv h2{margin:26px 0 0}
+.sp{border:0;background:none;font-size:1.1rem;cursor:pointer}
 .back{background:none;border:0;color:var(--acc);padding:0;margin-bottom:10px;font-weight:700}
 nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--card);border-bottom:1px solid var(--line);display:flex;justify-content:center;gap:6px;padding:8px}
-nav button{font:inherit;font-weight:700;border:0;background:none;color:var(--mute);padding:10px 26px;border-radius:8px;cursor:pointer}
+nav button{font:inherit;font-weight:700;border:0;background:none;color:var(--mute);padding:10px 14px;border-radius:8px;cursor:pointer}
 nav button[aria-selected=true]{background:var(--acc);color:#fff}
 nav button:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
-</style></head><body><nav id="nav"><button data-n="theo">Théorie</button><button data-n="exo">Exercices</button></nav><main id="app"></main>
+</style></head><body><nav id="nav"><button data-n="theo">Théorie</button><button data-n="exo">Exercices</button><button data-n="voc">Vocabulaire</button></nav><main id="app"></main>
 <script>
 const D=[
 ["A1","To be",["I ___ from Belgium.|am|am/is/are","She ___ my sister.|is|is/are/am","They ___ at school.|are|is/are/am","He ___ a student. (négatif)|isn't~is not","___ you hungry? (question)|Are"]],
@@ -87,6 +88,7 @@ const get=k=>{try{return localStorage.getItem(k)}catch(e){return null}};
 const set=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
 const parse=s=>{const p=s.split('|');return{q:p[0],a:p[1].split('~'),o:p[2]?p[2].split('/'):null}};
 function home(){
+ if(sec==='voc')return vhome();
  const lv=['A1','A2','B1'],n=D.reduce((c,d)=>c+d[2].length,0);
  setSec(sec);
  let h=sec==='exo'?`<h1>Exercices</h1><p>${D.length} séries, ${n} exercices corrigés tout de suite. Choisis une série ou un test mixte.</p>`:`<h1>Théorie</h1><p>${D.length} fiches de cours avec règles et exemples. Ouvre une fiche, puis passe aux exercices.</p>`;h+=`<div class="chips" style="margin-top:14px">`;
@@ -104,7 +106,7 @@ function home(){
  app.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>run('Test mixte '+b.dataset.r,shuf(D.flatMap((d,i)=>d[0]===b.dataset.r?d[2].map(x=>[x,i]):[])).slice(0,10).map(([x,i])=>({...parse(x),t:i})),-1));
 }
 function run(title,qs,id){
- let i=0,sc=0;const miss=[];setSec('exo');
+ let i=0,sc=0;const miss=[];setSec(qs[0]&&qs[0].v?'voc':'exo');
  function step(){
   if(i>=qs.length){
    if(id>=0&&sc>(+get('b'+id)||0))set('b'+id,sc);
@@ -200,7 +202,7 @@ for(let i=0;i<30;i++)FULL.add(i);
 function review(m){
  if(!m.length)return '';
  let h=`<div class="rv"><h2>Pourquoi ces erreurs ?</h2><p>${m.length} erreur${m.length>1?'s':''}. Pour chacune : ta réponse, la bonne réponse, puis un extrait de la fiche à relire.</p>`;
- m.forEach(x=>{
+ m.forEach(x=>{if(x.q.v){h+=`<div class="q"><div class="s">${x.q.q}</div><p>Ta réponse : <span class="k">${x.given}</span><br>Bonne réponse : <span class="g">${x.q.a[0]}</span></p><p>À retenir : <span class="en">${x.q.w[0]}</span> = ${x.q.w[1]} (thème : ${x.q.c})</p></div>`;return}
   const d=D[x.ti],box=document.createElement('div');box.innerHTML=TH[x.ti];
   const k=box.querySelector('.box.warn')||box.querySelector('.box.tip')||box.querySelector('.box'),t=box.querySelector('table'),h3=box.querySelector('h3');
   if(t){[...t.querySelectorAll('tr')].slice(9).forEach(r=>r.remove())}
@@ -212,6 +214,56 @@ function review(m){
   <details><summary>Relire toute la fiche</summary><div class="th">${TH[x.ti]}</div></details></div>`;
  });
  return h+'</div>';
+}
+const V=[
+["🍎","Fruits et légumes","apple=pomme,banana=banane,orange=orange,grape=raisin,strawberry=fraise,lemon=citron,peach=pêche,pear=poire,carrot=carotte,potato=pomme de terre,tomato=tomate,onion=oignon,lettuce=salade,cucumber=concombre"],
+["🍞","Nourriture et boissons","bread=pain,cheese=fromage,meat=viande,chicken=poulet,fish=poisson,rice=riz,egg=œuf,milk=lait,butter=beurre,sugar=sucre,water=eau,juice=jus,coffee=café,soup=soupe"],
+["🏠","Pièces de la maison","kitchen=cuisine,bedroom=chambre,bathroom=salle de bain,living room=salon,garden=jardin,garage=garage,attic=grenier,basement=sous-sol,hall=entrée,stairs=escalier,roof=toit,window=fenêtre,door=porte"],
+["🛋️","Meubles et objets","table=table,chair=chaise,sofa=canapé,bed=lit,wardrobe=armoire,shelf=étagère,lamp=lampe,mirror=miroir,carpet=tapis,curtain=rideau,fridge=réfrigérateur,oven=four,sink=évier,clock=horloge"],
+["🚗","Véhicules et transports","car=voiture,bus=bus,train=train,plane=avion,bike=vélo,motorbike=moto,truck=camion,boat=bateau,ship=navire,taxi=taxi,tram=tramway,subway=métro,helicopter=hélicoptère,van=camionnette"],
+["🌍","Pays","France=France,Spain=Espagne,Germany=Allemagne,Italy=Italie,Belgium=Belgique,Switzerland=Suisse,Netherlands=Pays-Bas,Portugal=Portugal,Greece=Grèce,Poland=Pologne,Turkey=Turquie,Morocco=Maroc,China=Chine,Japan=Japon,Brazil=Brésil,United States=États-Unis,England=Angleterre"],
+["👕","Vêtements","shirt=chemise,t-shirt=t-shirt,trousers=pantalon,jeans=jean,dress=robe,skirt=jupe,jacket=veste,coat=manteau,sweater=pull,shoes=chaussures,socks=chaussettes,hat=chapeau,scarf=écharpe,gloves=gants"],
+["👨‍👩‍👧","Famille","mother=mère,father=père,sister=sœur,brother=frère,grandmother=grand-mère,grandfather=grand-père,aunt=tante,uncle=oncle,cousin=cousin,son=fils,daughter=fille,husband=mari,wife=épouse,nephew=neveu"],
+["🧍","Corps humain","head=tête,hair=cheveux,eye=œil,ear=oreille,nose=nez,mouth=bouche,tooth=dent,neck=cou,shoulder=épaule,arm=bras,hand=main,finger=doigt,leg=jambe,foot=pied,back=dos"],
+["🐶","Animaux","dog=chien,cat=chat,horse=cheval,cow=vache,pig=cochon,sheep=mouton,bird=oiseau,rabbit=lapin,lion=lion,elephant=éléphant,bear=ours,monkey=singe,snake=serpent,wolf=loup"],
+["🌦️","Météo et saisons","sun=soleil,rain=pluie,snow=neige,wind=vent,cloud=nuage,storm=orage,fog=brouillard,spring=printemps,summer=été,autumn=automne,winter=hiver,hot=chaud,cold=froid,temperature=température"],
+["💼","Métiers","teacher=professeur,doctor=médecin,nurse=infirmier,engineer=ingénieur,lawyer=avocat,waiter=serveur,driver=chauffeur,farmer=agriculteur,cook=cuisinier,police officer=policier,firefighter=pompier,dentist=dentiste,artist=artiste,builder=ouvrier du bâtiment"],
+["🏫","École et études","school=école,student=élève,classroom=salle de classe,homework=devoirs,exam=examen,lesson=cours,pen=stylo,pencil=crayon,notebook=cahier,book=livre,desk=bureau,subject=matière,grade=note,university=université"],
+["🏙️","Ville et lieux","street=rue,shop=magasin,bank=banque,hospital=hôpital,pharmacy=pharmacie,post office=bureau de poste,station=gare,airport=aéroport,market=marché,museum=musée,park=parc,bridge=pont,church=église,library=bibliothèque"],
+["📅","Jours et mois","Monday=lundi,Tuesday=mardi,Wednesday=mercredi,Thursday=jeudi,Friday=vendredi,Saturday=samedi,Sunday=dimanche,January=janvier,February=février,March=mars,April=avril,May=mai,June=juin,July=juillet,August=août,September=septembre,October=octobre,November=novembre,December=décembre"],
+["🎨","Couleurs et formes","red=rouge,blue=bleu,green=vert,yellow=jaune,black=noir,white=blanc,grey=gris,pink=rose,purple=violet,brown=marron,circle=cercle,square=carré,triangle=triangle"],
+["🔢","Nombres","one=un,two=deux,three=trois,four=quatre,five=cinq,six=six,seven=sept,eight=huit,nine=neuf,ten=dix,twenty=vingt,fifty=cinquante,hundred=cent,thousand=mille"],
+["😀","Émotions et caractère","happy=heureux,sad=triste,angry=en colère,tired=fatigué,afraid=effrayé,nervous=nerveux,proud=fier,shy=timide,kind=gentil,funny=drôle,lazy=paresseux,brave=courageux,honest=honnête,jealous=jaloux"],
+["⚽","Sports et loisirs","football=football,tennis=tennis,swimming=natation,cycling=cyclisme,running=course à pied,basketball=basket,skiing=ski,dancing=danse,reading=lecture,painting=peinture,cooking=cuisine (activité),fishing=pêche,hiking=randonnée,gaming=jeux vidéo"],
+["💻","Technologie","computer=ordinateur,phone=téléphone,screen=écran,keyboard=clavier,website=site web,email=e-mail,password=mot de passe,app=application,battery=batterie,charger=chargeur,file=fichier,download=télécharger,wifi=wifi"],
+["✈️","Voyage et hôtel","ticket=billet,passport=passeport,suitcase=valise,luggage=bagages,flight=vol,hotel=hôtel,reservation=réservation,room=chambre d'hôtel,tourist=touriste,map=carte,journey=voyage,customs=douane,delay=retard,beach=plage"],
+["🏥","Santé","health=santé,headache=mal de tête,fever=fièvre,cough=toux,medicine=médicament,pain=douleur,injury=blessure,ambulance=ambulance,appointment=rendez-vous,allergy=allergie,sick=malade,flu=grippe"],
+["🛍️","Shopping et argent","money=argent,price=prix,cheap=bon marché,expensive=cher,discount=réduction,receipt=reçu,cash=espèces,credit card=carte bancaire,customer=client,size=taille,to buy=acheter,to sell=vendre,to pay=payer,bag=sac"],
+["🔁","Verbes courants","to wake up=se réveiller,to eat=manger,to drink=boire,to work=travailler,to sleep=dormir,to walk=marcher,to run=courir,to read=lire,to write=écrire,to speak=parler,to listen=écouter,to open=ouvrir,to close=fermer,to learn=apprendre"],
+["✨","Adjectifs courants","big=grand,small=petit,fast=rapide,slow=lent,new=nouveau,old=vieux,easy=facile,difficult=difficile,beautiful=beau,ugly=laid,clean=propre,dirty=sale,strong=fort,weak=faible"],
+["🗣️","Expressions utiles","hello=bonjour,goodbye=au revoir,please=s'il vous plaît,thank you=merci,sorry=désolé,excuse me=excusez-moi,yes=oui,no=non,see you soon=à bientôt,good morning=bonjour (le matin),good night=bonne nuit,how are you?=comment allez-vous ?,I don't understand=je ne comprends pas,welcome=bienvenue"]
+];
+const vp=i=>V[i][2].split(',').map(x=>{const a=x.split('=');return{en:a[0],fr:a[1],c:V[i][1]}});
+const vall=()=>V.flatMap((_,i)=>vp(i));
+function vquiz(title,pool){
+ const qs=shuf(pool).slice(0,10).map(p=>{const d=Math.random()<.5,ans=d?p.fr:p.en;
+  const o=[...new Set([ans,...shuf(pool.map(x=>d?x.fr:x.en).filter(x=>x!==ans)).slice(0,3)])];
+  return{q:d?`Que veut dire « ${p.en} » ?`:`Comment dit-on « ${p.fr} » en anglais ?`,a:[ans],o,v:1,w:[p.en,p.fr],c:p.c}});
+ run(title,qs,-1);
+}
+function vhome(){
+ setSec('voc');
+ app.innerHTML=`<h1>Vocabulaire</h1><p>${V.length} thèmes, ${vall().length} mots. Ouvre un thème pour apprendre la liste, puis teste-toi.</p><div class="grid" style="margin-top:14px">${V.map((v,i)=>`<button class="t" data-v="${i}"><span>${v[0]} ${v[1]}</span><small>${vp(i).length}</small></button>`).join('')}</div><p style="margin-top:14px"><button class="go" id="va">Test mixte : tous les thèmes</button></p>`;
+ app.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>vtheme(+b.dataset.v));
+ document.getElementById('va').onclick=()=>vquiz('Vocabulaire : test mixte',vall());
+}
+function vtheme(i){
+ const w=vp(i);
+ app.innerHTML=`<button class="back" id="bk">← Vocabulaire</button><h1>${V[i][0]} ${V[i][1]}</h1><div class="q th"><div class="sc"><table><tr><th>English</th><th>Français</th><th></th></tr>${w.map(x=>`<tr><td class="en">${x.en}</td><td>${x.fr}</td><td><button class="sp" data-w="${x.en}" aria-label="Écouter ${x.en}">🔊</button></td></tr>`).join('')}</table></div></div><p style="margin-top:16px"><button class="go" id="vt">Se tester (10 mots)</button></p>`;
+ document.getElementById('bk').onclick=vhome;
+ document.getElementById('vt').onclick=()=>vquiz(V[i][1],w);
+ app.querySelectorAll('.sp').forEach(b=>b.onclick=()=>{if('speechSynthesis' in window){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(b.dataset.w.replace(/^to /,''));u.lang='en-GB';speechSynthesis.speak(u)}});
+ window.scrollTo(0,0);
 }
 function theory(i){
  const d=D[i];setSec('theo');
