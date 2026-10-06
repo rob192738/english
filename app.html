@@ -61,7 +61,7 @@ nav button[aria-selected=true]{background:linear-gradient(135deg,var(--acc),var(
 .t{--c:var(--acc);border:0;border-radius:16px;padding:14px 16px 14px 20px;box-shadow:var(--sh);position:relative;overflow:hidden;align-items:center;font-weight:700;transition:transform .15s}
 .t::before{content:"";width:7px;position:absolute;left:0;top:0;bottom:0;background:var(--c)}
 .t:active{transform:scale(.97)}
-.t small{background:color-mix(in srgb,var(--c) 18%,transparent);color:var(--c);padding:2px 10px;border-radius:99px;font-weight:800}
+.t small{background:color-mix(in srgb,var(--c) 18%,transparent);color:var(--c);padding:2px 10px;border-radius:99px;font-weight:800;white-space:nowrap}
 .t.l-A1{--c:#12b886}.t.l-A2{--c:#ff8a3d}.t.l-B1{--c:#7c5cff}.t.done{outline:2px solid var(--ok)}
 .go{background:linear-gradient(135deg,var(--acc),var(--p2));color:#fff;border-radius:14px;padding:12px 24px;font-weight:800;box-shadow:0 6px 16px rgba(108,92,231,.35)}
 .q{border:0;border-radius:20px;box-shadow:var(--sh);padding:22px}
@@ -120,7 +120,7 @@ const app=document.getElementById('app');let flt='Tous',sec='theo';
 const setSec=x=>{sec=x;document.querySelectorAll('#nav button').forEach(b=>b.setAttribute('aria-selected',b.dataset.n===x))};
 document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>{setSec(b.dataset.n);home()});
 const norm=s=>s.trim().toLowerCase().replace(/[’‘]/g,"'").replace(/\s+/g,' ');
-const shuf=a=>[...a].sort(()=>Math.random()-.5);
+const shuf=a=>{const r=[...a];for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]]}return r};
 const get=k=>{try{return localStorage.getItem(k)}catch(e){return null}};
 const set=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
 const parse=s=>{const p=s.split('|');return{q:p[0],a:p[1].split('~'),o:p[2]?p[2].split('/'):null}};
@@ -143,15 +143,18 @@ function home(){
  app.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{const i=+b.dataset.s;sec==='exo'?run(D[i][1],D[i][2].map(parse),i):theory(i)});
  app.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>run('Test mixte '+b.dataset.r,shuf(D.flatMap((d,i)=>d[0]===b.dataset.r?d[2].map(x=>[x,i]):[])).slice(0,10).map(([x,i])=>({...parse(x),t:i})),-1));
 }
-function run(title,qs,id){
- let i=0,sc=0;const miss=[];setSec(qs[0]&&qs[0].v?'voc':qs[0]&&qs[0].r?'lec':'exo');
+function run(title,qs,id,key){
+ if(key===undefined&&id>=0)key='b'+id;
+ let i=0,sc=0;const miss=[];
+ const s=qs[0]&&qs[0].v?'voc':qs[0]&&qs[0].r?'lec':'exo';setSec(s);
+ const bl={voc:'← Vocabulaire',lec:'← Lecture',exo:'← Catalogue'}[s];
  function step(){
   if(i>=qs.length){
-   if(id>=0&&sc>(+get('b'+id)||0))set('b'+id,sc);
-   app.innerHTML=`<button class="back" id="bk">← Catalogue</button><h1>${title}</h1><div class="q"><div class="s">Score : ${sc} / ${qs.length}</div><p>${sc===qs.length?'Parfait !':sc>=qs.length*.7?'Très bien, encore un petit effort.':'Relis la fiche de cours et recommence.'}</p><p><button class="go" id="again">Recommencer</button></p></div>`;
-   app.insertAdjacentHTML('beforeend',review(miss));document.getElementById('bk').onclick=home;document.getElementById('again').onclick=()=>run(title,id>=0?shuf(qs):qs,id);return}
+   if(key&&sc>(+get(key)||0))set(key,sc);
+   app.innerHTML=`<button class="back" id="bk">${bl}</button><h1>${title}</h1><div class="q"><div class="s">Score : ${sc} / ${qs.length}</div><p>${sc===qs.length?'Parfait !':sc>=qs.length*.7?'Très bien, encore un petit effort.':'Relis la fiche de cours et recommence.'}</p><p><button class="go" id="again">Recommencer</button></p></div>`;
+   app.insertAdjacentHTML('beforeend',review(miss));document.getElementById('bk').onclick=home;document.getElementById('again').onclick=()=>run(title,id>=0?shuf(qs):qs,id,key);return}
   const q=qs[i];
-  app.innerHTML=`<button class="back" id="bk">← Catalogue</button><h1>${title}</h1><div class="bar"><i style="width:${i/qs.length*100}%"></i></div><p>Question ${i+1} / ${qs.length}</p>${q.p?`<details class="q" open><summary>📖 Texte</summary><p class="rd">${q.p}</p></details>`:''}<div class="q"><div class="s">${q.q.replace('___','<b>_____</b>')}</div><div id="in"></div><div class="fb" id="fb"></div><div id="nx"></div></div>`;
+  app.innerHTML=`<button class="back" id="bk">${bl}</button><h1>${title}</h1><div class="bar"><i style="width:${i/qs.length*100}%"></i></div><p>Question ${i+1} / ${qs.length}</p>${q.p?`<details class="q" open><summary>📖 Texte</summary><p class="rd">${q.p}</p></details>`:''}<div class="q"><div class="s">${q.q.replace('___','<b>_____</b>')}</div><div id="in"></div><div class="fb" id="fb"></div><div id="nx"></div></div>`;
   document.getElementById('bk').onclick=home;
   const fb=document.getElementById('fb'),nx=document.getElementById('nx'),inp=document.getElementById('in');
   function done(good,given){if(good)sc++;else miss.push({q,given,ti:q.t??id});fb.style.color=good?'var(--ok)':'var(--ko)';fb.textContent=good?'Correct !':'Réponse : '+q.a[0];
@@ -254,13 +257,13 @@ function review(m){
  return h+'</div>';
 }
 const V=[
-["🍎","Fruits et légumes","apple=pomme,banana=banane,orange=orange,grape=raisin,strawberry=fraise,lemon=citron,peach=pêche,pear=poire,carrot=carotte,potato=pomme de terre,tomato=tomate,onion=oignon,lettuce=salade,cucumber=concombre"],
+["🍎","Fruits et légumes","apple=pomme,banana=banane,orange=orange,grape=raisin,strawberry=fraise,lemon=citron,peach=pêche,pear=poire,carrot=carotte,potato=pomme de terre,tomato=tomate,onion=oignon,lettuce=laitue,cucumber=concombre"],
 ["🍞","Nourriture et boissons","bread=pain,cheese=fromage,meat=viande,chicken=poulet,fish=poisson,rice=riz,egg=œuf,milk=lait,butter=beurre,sugar=sucre,water=eau,juice=jus,coffee=café,soup=soupe"],
 ["🏠","Pièces de la maison","kitchen=cuisine,bedroom=chambre,bathroom=salle de bain,living room=salon,garden=jardin,garage=garage,attic=grenier,basement=sous-sol,hall=entrée,stairs=escalier,roof=toit,window=fenêtre,door=porte"],
 ["🛋️","Meubles et objets","table=table,chair=chaise,sofa=canapé,bed=lit,wardrobe=armoire,shelf=étagère,lamp=lampe,mirror=miroir,carpet=tapis,curtain=rideau,fridge=réfrigérateur,oven=four,sink=évier,clock=horloge"],
 ["🚗","Véhicules et transports","car=voiture,bus=bus,train=train,plane=avion,bike=vélo,motorbike=moto,truck=camion,boat=bateau,ship=navire,taxi=taxi,tram=tramway,subway=métro,helicopter=hélicoptère,van=camionnette"],
 ["🌍","Pays","France=France,Spain=Espagne,Germany=Allemagne,Italy=Italie,Belgium=Belgique,Switzerland=Suisse,Netherlands=Pays-Bas,Portugal=Portugal,Greece=Grèce,Poland=Pologne,Turkey=Turquie,Morocco=Maroc,China=Chine,Japan=Japon,Brazil=Brésil,United States=États-Unis,England=Angleterre"],
-["👕","Vêtements","shirt=chemise,t-shirt=t-shirt,trousers=pantalon,jeans=jean,dress=robe,skirt=jupe,jacket=veste,coat=manteau,sweater=pull,shoes=chaussures,socks=chaussettes,hat=chapeau,scarf=écharpe,gloves=gants"],
+["👕","Vêtements","clothes=vêtements,shirt=chemise,t-shirt=t-shirt,blouse=chemisier,trousers=pantalon,jeans=jean,shorts=short,dress=robe,skirt=jupe,jacket=veste,coat=manteau,sweater=sweat,pull-over=pull,cardigan=gilet,hoodie=sweat à capuche,shoes=chaussures,socks=chaussettes,hat=chapeau,scarf=écharpe,gloves=gants"],
 ["👨‍👩‍👧","Famille","mother=mère,father=père,sister=sœur,brother=frère,grandmother=grand-mère,grandfather=grand-père,aunt=tante,uncle=oncle,cousin=cousin,son=fils,daughter=fille,husband=mari,wife=épouse,nephew=neveu"],
 ["🧍","Corps humain","head=tête,hair=cheveux,eye=œil,ear=oreille,nose=nez,mouth=bouche,tooth=dent,neck=cou,shoulder=épaule,arm=bras,hand=main,finger=doigt,leg=jambe,foot=pied,back=dos"],
 ["🐶","Animaux","dog=chien,cat=chat,horse=cheval,cow=vache,pig=cochon,sheep=mouton,bird=oiseau,rabbit=lapin,lion=lion,elephant=éléphant,bear=ours,monkey=singe,snake=serpent,wolf=loup"],
@@ -288,7 +291,7 @@ const VX=[
 "desk=bureau (meuble),drawer=tiroir,cupboard=placard,cushion=coussin,pillow=oreiller,blanket=couverture,towel=serviette,bin=poubelle,broom=balai,vase=vase,frame=cadre,plate=assiette,fork=fourchette,knife=couteau,spoon=cuillère,cup=tasse",
 "bicycle=bicyclette,scooter=trottinette,lorry=poids lourd,parking=parking,traffic=circulation,road=route,motorway=autoroute,petrol=essence,engine=moteur,wheel=roue,tyre=pneu,ferry=ferry,pavement=trottoir,roundabout=rond-point,traffic light=feu de circulation",
 "Ireland=Irlande,Scotland=Écosse,Wales=pays de Galles,Austria=Autriche,Sweden=Suède,Norway=Norvège,Denmark=Danemark,Russia=Russie,India=Inde,Canada=Canada,Mexico=Mexique,Egypt=Égypte,Australia=Australie,Argentina=Argentine,Luxembourg=Luxembourg",
-"suit=costume,tie=cravate,belt=ceinture,boots=bottes,trainers=baskets,pyjamas=pyjama,underwear=sous-vêtements,swimsuit=maillot de bain,raincoat=imperméable,cap=casquette,pocket=poche,button=bouton,zip=fermeture éclair,sleeve=manche",
+"suit=costume,tie=cravate,belt=ceinture,boots=bottes,trainers=baskets (de sport),sneakers=baskets (de marche),underwear=sous-vêtements,bra=soutien-gorge,pyjamas=pyjama,swimsuit=maillot de bain,raincoat=imperméable,cap=casquette,bag=sac,pocket=poche,button=bouton,zip=fermeture éclair,sleeve=manche,striped=rayé,tight=serrant",
 "niece=nièce,grandson=petit-fils,granddaughter=petite-fille,parents=parents,twin=jumeau,stepfather=beau-père,mother-in-law=belle-mère,brother-in-law=beau-frère,relative=membre de la famille,baby=bébé,child=enfant,teenager=adolescent,widow=veuve,fiancé=fiancé",
 "chin=menton,cheek=joue,forehead=front,lip=lèvre,tongue=langue,throat=gorge,chest=poitrine,stomach=ventre,knee=genou,elbow=coude,ankle=cheville,wrist=poignet,skin=peau,heart=cœur,bone=os,muscle=muscle",
 "duck=canard,goat=chèvre,hen=poule,fox=renard,deer=cerf,squirrel=écureuil,mouse=souris,frog=grenouille,butterfly=papillon,bee=abeille,spider=araignée,dolphin=dauphin,whale=baleine,tiger=tigre,giraffe=girafe,turtle=tortue",
@@ -316,15 +319,21 @@ V.push(["🌳","Nature et environnement","forest=forêt,mountain=montagne,river=
 ["🎭","Idiomes et nuances (C2)","a blessing in disguise=un mal pour un bien,break the ice=briser la glace,once in a blue moon=tous les trente-six du mois,hit the nail on the head=mettre le doigt dessus,under the weather=patraque,piece of cake=un jeu d'enfant,spill the beans=vendre la mèche,cost an arm and a leg=coûter les yeux de la tête,the tip of the iceberg=la partie émergée de l'iceberg,burn the midnight oil=veiller tard pour travailler,call it a day=arrêter pour aujourd'hui,face the music=assumer les conséquences,beat around the bush=tourner autour du pot,in the long run=à long terme,at stake=en jeu,reluctant=réticent"]);
 const vp=i=>V[i][2].split(',').map(x=>{const a=x.split('=');return{en:a[0],fr:a[1],c:V[i][1]}});
 const vall=()=>V.flatMap((_,i)=>vp(i));
-function vquiz(title,pool){
- const qs=shuf(pool).slice(0,10).map(p=>{const d=Math.random()<.5,ans=d?p.fr:p.en;
-  const o=[...new Set([ans,...shuf(pool.map(x=>d?x.fr:x.en).filter(x=>x!==ans)).slice(0,3)])];
+// Deux mots sont "proches" s'ils ont le même mot anglais ou une traduction qui se recoupe (souris / souris d'ordinateur, salade / salade…)
+const vb=s=>s.replace(/\s*\(.*?\)/g,'').trim().toLowerCase();
+const near=(a,b)=>{if(a.en.toLowerCase()===b.en.toLowerCase())return true;const x=vb(a.fr),y=vb(b.fr);return x===y||x.startsWith(y+' ')||y.startsWith(x+' ')};
+function vquiz(title,pool,key){
+ const seen=new Set(),picks=[];
+ for(const p of shuf(pool)){const k=p.en.toLowerCase();if(seen.has(k))continue;seen.add(k);picks.push(p);if(picks.length===10)break}
+ const qs=picks.map(p=>{const d=Math.random()<.5,ans=d?p.fr:p.en;
+  const others=[...new Set(pool.filter(x=>!near(x,p)).map(x=>d?x.fr:x.en))];
+  const o=[ans,...shuf(others).slice(0,3)];
   return{q:d?`Que veut dire « ${p.en} » ?`:`Comment dit-on « ${p.fr} » en anglais ?`,a:[ans],o,v:1,w:[p.en,p.fr],c:p.c}});
- run(title,qs,-1);
+ run(title,qs,-1,key);
 }
 function vhome(){
  setSec('voc');
- app.innerHTML=`<h1>Vocabulaire</h1><p>${V.length} thèmes, ${vall().length} mots. Ouvre un thème pour apprendre la liste, puis teste-toi.</p><div class="grid" style="margin-top:14px">${V.map((v,i)=>`<button class="t" data-v="${i}" style="--c:hsl(${i*47} 78% 52%)"><span>${v[0]} ${v[1]}</span><small>${vp(i).length}</small></button>`).join('')}</div><p style="margin-top:14px"><button class="go" id="va">Test mixte : tous les thèmes</button></p>`;
+ app.innerHTML=`<h1>Vocabulaire</h1><p>${V.length} thèmes, ${vall().length} mots. Ouvre un thème pour apprendre la liste, puis teste-toi.</p><div class="grid" style="margin-top:14px">${V.map((v,i)=>{const b=get('v'+i);return`<button class="t ${b?'done':''}" data-v="${i}" style="--c:hsl(${i*47} 78% 52%)"><span>${v[0]} ${v[1]}</span><small>${b?b+'/10':vp(i).length+' mots'}</small></button>`}).join('')}</div><p style="margin-top:14px"><button class="go" id="va">Test mixte : tous les thèmes</button></p>`;
  app.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>vtheme(+b.dataset.v));
  document.getElementById('va').onclick=()=>vquiz('Vocabulaire : test mixte',vall());
 }
@@ -332,7 +341,7 @@ function vtheme(i){
  const w=vp(i);
  app.innerHTML=`<button class="back" id="bk">← Vocabulaire</button><h1>${V[i][0]} ${V[i][1]}</h1><div class="q th"><div class="sc"><table><tr><th>English</th><th>Français</th><th></th></tr>${w.map(x=>`<tr><td class="en">${x.en}</td><td>${x.fr}</td><td><button class="sp" data-w="${x.en}" aria-label="Écouter ${x.en}">🔊</button></td></tr>`).join('')}</table></div></div><p style="margin-top:16px"><button class="go" id="vt">Se tester (10 mots)</button></p>`;
  document.getElementById('bk').onclick=vhome;
- document.getElementById('vt').onclick=()=>vquiz(V[i][1],w);
+ document.getElementById('vt').onclick=()=>vquiz(V[i][1],w,'v'+i);
  app.querySelectorAll('.sp').forEach(b=>b.onclick=()=>{if('speechSynthesis' in window){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(b.dataset.w.replace(/^to /,''));u.lang='en-GB';speechSynthesis.speak(u)}});
  window.scrollTo(0,0);
 }
@@ -365,11 +374,11 @@ const R=[
 ["A2","Moving house","Emma and Paul are moving to a bigger flat. The new flat has two bedrooms and a balcony. It is more expensive than their old flat, but it is closer to the station. They are packing boxes this week.",["Pourquoi le nouvel appartement est-il pratique ?|Il est proche de la gare|Il est moins cher/Il est proche de la gare/Il a un jardin|closer to the station","Que font-ils cette semaine ?|Ils font des cartons|Ils visitent/Ils font des cartons/Ils peignent|packing boxes this week"]],
 ["A2","The lost phone","Yesterday I lost my phone on the bus. I was worried because all my photos were on it. In the evening, a woman called my number. She found it under a seat. We met at the station and I thanked her.",["Où le téléphone a-t-il été trouvé ?|Sous un siège|Dans un sac/Sous un siège/Au café|She found it under a seat","Pourquoi était-il inquiet ?|Ses photos étaient dessus|Il était cher/Ses photos étaient dessus/Il n'avait plus de batterie|all my photos were on it"]],
 ["A2","Healthy habits","Julia usually drinks a lot of water and eats fruit every day. She doesn't eat much sugar. Twice a week she goes swimming, and on Sundays she cycles with her father. She says she feels stronger than last year.",["Combien de fois par semaine nage-t-elle ?|Deux fois|Une fois/Deux fois/Tous les jours|Twice a week she goes swimming","Que fait-elle le dimanche ?|Du vélo avec son père|Elle nage/Du vélo avec son père/Elle se repose|on Sundays she cycles with her father"]],
-["B1","A change of career","After ten years as an accountant, David decided to become a teacher. He has always enjoyed explaining things, although he was worried about earning less money. He has been studying in the evenings for two years. If he passes his final exam, he will start teaching in September.",["Why was David worried?|He would earn less money|He didn't like children/He would earn less money/He was too old|worried about earning less money","When will he start teaching?|In September, if he passes|Next week/In September, if he passes/Never|If he passes his final exam, he will start teaching in September"]],
-["B1","The village festival","Every August, my village organises a festival that attracts visitors from all over the region. There is live music, a food market and a parade. Although the weather is sometimes unpredictable, nobody wants to miss it. This year, more than two thousand people came.",["When is the festival?|In August|In May/In August/In winter|Every August","What does the text say about the weather?|It can be unpredictable|It is always sunny/It can be unpredictable/It is always cold|the weather is sometimes unpredictable"]],
-["B1","Learning a language","Learning a language takes time, but you don't have to study for hours. Experts say that twenty minutes a day is better than one long session a week. You should also listen to songs and watch films, because you will learn new expressions without noticing it.",["What is better according to experts?|Twenty minutes every day|One long weekly session/Twenty minutes every day/Studying all night|twenty minutes a day is better","Why should you watch films?|To learn expressions without noticing|To relax only/To learn expressions without noticing/To avoid grammar|you will learn new expressions without noticing it"]],
-["B1","A difficult journey","Our flight was cancelled, so we had to take a bus to the airport in another city. When we finally arrived, we had been travelling for fourteen hours. Fortunately, the hotel staff were very kind and gave us a free dinner.",["Why did they take a bus?|Their flight was cancelled|They hated planes/Their flight was cancelled/The train was full|Our flight was cancelled","What did the hotel give them?|A free dinner|A free room/A free dinner/A taxi|gave us a free dinner"]],
-["B1","Remote work","More people work from home than ten years ago. Many say they save time because they don't commute. However, some feel lonely and find it hard to separate work from private life. Companies are now trying to offer a mix of home and office days.",["What is one advantage of remote work?|People don't commute|Higher salary/People don't commute/Free lunch|they save time because they don't commute","What are companies trying to offer?|A mix of home and office days|Only office work/A mix of home and office days/Only remote work|a mix of home and office days"]]
+["B1","A change of career","After ten years as an accountant, David decided to become a teacher. He has always enjoyed explaining things, although he was worried about earning less money. He has been studying in the evenings for two years. If he passes his final exam, he will start teaching in September.",["Pourquoi David était-il inquiet ?|Il gagnerait moins d'argent|Il n'aimait pas les enfants/Il gagnerait moins d'argent/Il était trop âgé|worried about earning less money","Quand commencera-t-il à enseigner ?|En septembre, s'il réussit son examen|La semaine prochaine/En septembre, s'il réussit son examen/Jamais|If he passes his final exam, he will start teaching in September"]],
+["B1","The village festival","Every August, my village organises a festival that attracts visitors from all over the region. There is live music, a food market and a parade. Although the weather is sometimes unpredictable, nobody wants to miss it. This year, more than two thousand people came.",["Quand a lieu le festival ?|En août|En mai/En août/En hiver|Every August","Que dit le texte sur la météo ?|Elle peut être imprévisible|Il fait toujours beau/Elle peut être imprévisible/Il fait toujours froid|the weather is sometimes unpredictable"]],
+["B1","Learning a language","Learning a language takes time, but you don't have to study for hours. Experts say that twenty minutes a day is better than one long session a week. You should also listen to songs and watch films, because you will learn new expressions without noticing it.",["Qu'est-ce qui est mieux selon les experts ?|Vingt minutes chaque jour|Une longue séance par semaine/Vingt minutes chaque jour/Étudier toute la nuit|twenty minutes a day is better","Pourquoi regarder des films ?|Pour apprendre des expressions sans s'en rendre compte|Seulement pour se détendre/Pour apprendre des expressions sans s'en rendre compte/Pour éviter la grammaire|you will learn new expressions without noticing it"]],
+["B1","A difficult journey","Our flight was cancelled, so we had to take a bus to the airport in another city. When we finally arrived, we had been travelling for fourteen hours. Fortunately, the hotel staff were very kind and gave us a free dinner.",["Pourquoi ont-ils pris un bus ?|Leur vol a été annulé|Ils détestaient l'avion/Leur vol a été annulé/Le train était complet|Our flight was cancelled","Qu'a offert l'hôtel ?|Un dîner gratuit|Une chambre gratuite/Un dîner gratuit/Un taxi|gave us a free dinner"]],
+["B1","Remote work","More people work from home than ten years ago. Many say they save time because they don't commute. However, some feel lonely and find it hard to separate work from private life. Companies are now trying to offer a mix of home and office days.",["Quel est un avantage du télétravail ?|Pas de trajet jusqu'au bureau|Un meilleur salaire/Pas de trajet jusqu'au bureau/Un déjeuner gratuit|they save time because they don't commute","Que proposent les entreprises ?|Un mélange de jours à la maison et au bureau|Seulement le bureau/Un mélange de jours à la maison et au bureau/Seulement le télétravail|a mix of home and office days"]]
 ];
 R.push(
 ["B2","Urban gardens","More cities are turning empty land into community gardens. Residents grow vegetables together, which lowers food costs and brings neighbours closer. Critics argue that the plots occupy space that could be used for housing, yet supporters say the social benefits outweigh this drawback.",["Quel avantage est cité ?|Cela rapproche les voisins|Cela attire des touristes/Cela rapproche les voisins/Cela fait monter les loyers|brings neighbours closer","Que reprochent les critiques ?|Ils prennent la place de logements|Ils sont trop chers/Ils prennent la place de logements/Ils sont bruyants|could be used for housing"]],
@@ -392,7 +401,7 @@ function lhome(){
  setSec('lec');
  let h=`<h1>Lecture</h1><p>${R.length} textes avec questions. Lis, écoute le texte, puis réponds.</p>`;
  ['A1','A2','B1','B2','C1','C2'].filter(l=>R.some(r=>r[0]===l)).forEach(l=>{
-  h+=`<h2><span class="lv l-${l}">Niveau ${l}</span></h2><div class="grid">`+R.map((r,i)=>r[0]===l?`<button class="t l-${l}" data-x="${i}"><span>${r[1]}</span><small>${r[3].length} q.</small></button>`:'').join('')+'</div>';
+  h+=`<h2><span class="lv l-${l}">Niveau ${l}</span></h2><div class="grid">`+R.map((r,i)=>{if(r[0]!==l)return '';const b=get('r'+i);return`<button class="t l-${l} ${b?'done':''}" data-x="${i}"><span>${r[1]}</span><small>${b?b+'/'+r[3].length:r[3].length+' q.'}</small></button>`}).join('')+'</div>';
  });
  app.innerHTML=h;
  app.querySelectorAll('[data-x]').forEach(b=>b.onclick=()=>ltext(+b.dataset.x));
@@ -402,7 +411,7 @@ function ltext(i){
  app.innerHTML=`<button class="back" id="bk">← Lecture</button><p><span class="lv l-${r[0]}">${r[0]}</span></p><h1>${r[1]}</h1><div class="q"><p class="rd">${r[2]}</p><button class="sp" id="ls" style="font-size:1rem;color:var(--acc);font-weight:800">🔊 Écouter le texte</button></div><p style="margin-top:16px"><button class="go" id="lq">Répondre aux questions</button></p>`;
  document.getElementById('bk').onclick=lhome;
  document.getElementById('ls').onclick=()=>{if('speechSynthesis' in window){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(r[2]);u.lang='en-GB';u.rate=.9;speechSynthesis.speak(u)}};
- document.getElementById('lq').onclick=()=>run(r[1],r[3].map(x=>{const p=x.split('|');return{q:p[0],a:[p[1]],o:p[2].split('/'),r:1,e:p[3],p:r[2]}}),-1);
+ document.getElementById('lq').onclick=()=>run(r[1],r[3].map(x=>{const p=x.split('|');return{q:p[0],a:[p[1]],o:p[2].split('/'),r:1,e:p[3],p:r[2]}}),-1,'r'+i);
  window.scrollTo(0,0);
 }
 function theory(i){
