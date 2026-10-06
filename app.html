@@ -82,6 +82,11 @@ nav button[aria-selected=true]{background:linear-gradient(135deg,var(--acc),var(
 details.q summary{cursor:pointer;font-weight:800;color:var(--acc)}
 .lv.l-B2{background:#e84393}.lv.l-C1{background:#0984e3}.lv.l-C2{background:#c9971c}
 .t.l-B2{--c:#e84393}.t.l-C1{--c:#0984e3}.t.l-C2{--c:#c9971c}
+.irr{display:flex;gap:12px;flex-wrap:wrap}.irr label{display:flex;flex-direction:column;gap:4px;font-weight:800;color:var(--mute);flex:1;min-width:140px}.q .irr input{max-width:none}
+.ans{min-height:60px;border:2px dashed var(--line);border-radius:14px;padding:8px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:14px}
+.wd{display:flex;flex-wrap:wrap;gap:8px}
+.ans button,.wd button{border:2px solid var(--line);background:var(--card);border-radius:12px;padding:9px 13px;font-weight:700;box-shadow:0 3px 0 var(--line)}
+.ans button{border-color:var(--acc)}.ans .ph{color:var(--mute)}.ans .pt{font-weight:800;font-size:1.2rem}
 </style></head><body><nav id="nav"><button data-n="theo"><i>📘</i>Théorie</button><button data-n="exo"><i>✏️</i>Exercices</button><button data-n="voc"><i>🗂️</i>Vocabulaire</button><button data-n="lec"><i>📖</i>Lecture</button></nav><main id="app"></main>
 <script>
 const D=[
@@ -129,7 +134,8 @@ function home(){
  if(sec==='voc')return vhome();
  const lv=['A1','A2','B1','B2','C1','C2'],n=D.reduce((c,d)=>c+d[2].length,0);
  setSec(sec);
- let h=sec==='exo'?`<h1>Exercices</h1><p>${D.length} séries, ${n} exercices corrigés tout de suite. Choisis une série ou un test mixte.</p>`:`<h1>Théorie</h1><p>${D.length} fiches de cours avec règles et exemples. Ouvre une fiche, puis passe aux exercices.</p>`;h+=`<div class="chips" style="margin-top:14px">`;
+ let h=sec==='exo'?`<h1>Exercices</h1><p>${D.length} séries, ${n} exercices corrigés tout de suite. Choisis une série ou un test mixte.</p>`:`<h1>Théorie</h1><p>${D.length} fiches de cours avec règles et exemples. Ouvre une fiche, puis passe aux exercices.</p>`;if(sec==='exo'){const bi=get('irr');h+=`<h2>Entraînements spéciaux</h2><div class="grid"><button class="t ${bi?'done':''}" id="xirr" style="--c:#e17055"><span>🔤 Verbes irréguliers</span><small>${bi?bi+'/15':'15 verbes'}</small></button><button class="t" id="xord" style="--c:#00b894"><span>🧩 Phrases en désordre</span><small>6 niveaux</small></button></div><h2>Séries de grammaire</h2>`}
+ h+=`<div class="chips" style="margin-top:14px">`;
  ['Tous',...lv].forEach(l=>h+=`<button aria-pressed="${l===flt}" data-f="${l}">${l}</button>`);
  h+='</div>';
  lv.filter(l=>flt==='Tous'||l===flt).forEach(l=>{
@@ -139,6 +145,7 @@ function home(){
   h+='</div>';if(sec==='exo')h+=`<p style="margin-top:12px"><button class="go" data-r="${l}">Test mixte ${l} (10 questions)</button></p>`;
  });
  app.innerHTML=h;
+ if(sec==='exo'){document.getElementById('xirr').onclick=irr;document.getElementById('xord').onclick=ohome}
  app.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{flt=b.dataset.f;home()});
  app.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{const i=+b.dataset.s;sec==='exo'?run(D[i][1],shuf(D[i][2]).map(parse),i):theory(i)});
  app.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>run('Test mixte '+b.dataset.r,shuf(D.flatMap((d,i)=>d[0]===b.dataset.r?d[2].map(x=>[x,i]):[])).slice(0,10).map(([x,i])=>({...parse(x),t:i})),-1));
@@ -404,6 +411,184 @@ const XQ=[
 ["Don't ___ up! You're almost there.|give|give/take/put","Can you ___ after my cat this weekend?|look|look/see/take","I need to ___ up my mind.|make|make/do/take","The plane ___ off at 8.|took|took/got/put","She ___ up smoking last year.|gave|gave/took/made","We had to put ___ the trip until May.|off|off/up/on","He came ___ a great idea.|up with|up with/out of/down on","I ___ into an old friend at the station.|ran|ran/fell/got","Can you ___ me a favour?|do|do/make/take","You've ___ a mistake.|made|made/done/taken","Let's ___ a break.|take|take/do/make","She ___ after her mother; they look alike.|takes|takes/looks/comes","The firemen ___ out the fire quickly.|put|put/took/got","I'm looking ___ to the holidays.|forward|forward/after/up","He ___ his homework every evening.|does|does/makes/takes"]
 ];
 XQ.forEach((a,i)=>D[i][2].push(...a));
+
+// ===== Nouvelles séries B2 → C2 =====
+D.push(
+["B2","Futur continu et futur antérieur",["This time tomorrow, I ___ on a beach. (lie)|will be lying~'ll be lying","By 2030, they ___ the new stadium. (build)|will have built~'ll have built","Don't call at 8, we ___ dinner. (have)|will be having~'ll be having","By the time you arrive, I ___ the cake. (finish)|will have finished~'ll have finished","By next June, she ___ here for ten years.|will have worked|will work/will have worked/will be working","At 10 pm tonight, she ___ TV. (watch)|will be watching~'ll be watching","___ you be using the car tonight?|Will|Will/Are/Do","I ___ my homework by 6. (négatif, finish)|won't have finished~will not have finished","By the end of the year, we ___ 500 km.|will have walked|will walk/will have walked/are walking","When you get home, I ___ for you. (wait)|will be waiting~'ll be waiting","By Friday, I ___ all the emails.|will have answered|will answer/will have answered/will be answering","Next week at this time, we ___ to New York.|will be flying|will fly/will be flying/will have flown","She ___ the report by the time the boss arrives.|will have written|will write/will have written/writes","___ the time we get there, the shop will have closed.|By|By/Until/Since","By 2040, scientists ___ a cure. (find)|will have found~'ll have found","Tomorrow at noon, I ___ my driving test. (take)|will be taking~'ll be taking","How long ___ you have lived here by next year?|will|will/do/are","Will you have finished ___ Monday?|by|by/until/since","I can't meet you at 3 tomorrow. I ___ .|will be working|will have worked/will be working/work","Next month, they ___ married for 25 years.|will have been|will be/will have been/are being"]],
+["B2","Gérondif ou infinitif",["I enjoy ___ to music.|listening|listening/to listen","She decided ___ a new car.|to buy|buying/to buy","He avoided ___ the question.|answering|answering/to answer","We hope ___ you soon.|to see|seeing/to see","Would you mind ___ the window?|opening|opening/to open","They refused ___ the bill.|to pay|paying/to pay","I'm interested in ___ Spanish.|learning|learning/to learn","She keeps ___ the same mistake.|making|making/to make","He promised ___ late again.|not to be|not to be/not being/to not being","I stopped ___ two years ago. (j'ai arrêté de fumer)|smoking|smoking/to smoke","On the way, we stopped ___ a coffee. (pour prendre un café)|to have|having/to have","Remember ___ the door when you leave!|to lock|locking/to lock","I remember ___ him at a party years ago.|meeting|meeting/to meet","___ is good for your health.|Swimming|Swimming/Swim/To swimming","It's easy ___ this game.|to learn|learning/to learn","I can't stand ___ in queues.|waiting|waiting/to wait","She's good at ___ .|drawing|drawing/to draw","They agreed ___ us.|to help|helping/to help","Have you finished ___ the report?|writing|writing/to write","He suggested ___ a taxi.|taking|taking/to take"]],
+["B2","Present perfect continu",["I ___ for two hours. (wait)|have been waiting~'ve been waiting","She ___ English since 2020. (learn)|has been learning~'s been learning","Your eyes are red. ___ you been crying?|Have|Have/Has/Did","It ___ all day. (rain)|has been raining~'s been raining","How long have you ___ here?|been working|worked/been working/working","They're exhausted. They ___ for hours. (run)|have been running~'ve been running","I've ___ three letters this morning. (quantité)|written|written/been writing","I've ___ letters all morning. (activité)|been writing|written/been writing","He ___ this car for ten years. (have, verbe d'état)|has had~'s had","We ___ each other since 2015. (know)|have known~'ve known","She ___ the piano since she was six. (play)|has been playing~'s been playing","Why are you so dirty? — I ___ in the garden. (work)|have been working~'ve been working","I ___ well lately. (négatif, sleep)|haven't been sleeping~have not been sleeping","How long has he ___ ?|been studying|studying/been studying/studied","They've been talking ___ an hour.|for|for/since","I've ___ this book twice.|read|read/been reading","Sorry I'm late. ___ you been waiting long?|Have|Have/Has/Are","He ___ since 9 o'clock. (work)|has been working~'s been working","There's no chocolate left. Someone ___ it all! (eat, résultat)|has eaten~'s eaten","We ___ for a new flat for months. (look)|have been looking~'ve been looking"]],
+["B2","Question tags",["You're French, ___?|aren't you|aren't you/don't you/isn't it","She likes tea, ___?|doesn't she|isn't she/doesn't she/don't she","They didn't come, ___?|did they|did they/didn't they/were they","He can swim, ___?|can't he|can he/can't he/doesn't he","It isn't cold, ___?|is it|isn't it/is it/does it","You've seen this film, ___?|haven't you|haven't you/didn't you/don't you","I'm late, ___?|aren't I|am not I/aren't I/isn't I","Let's go, ___?|shall we|shall we/will we/don't we","Close the door, ___?|will you|will you/do you/don't you","She'll help us, ___?|won't she|won't she/will she/doesn't she","We should leave, ___?|shouldn't we|shouldn't we/should we/don't we","Nobody called, ___?|did they|did they/didn't they/did he","There's a problem, ___?|isn't there|isn't it/isn't there/is there","He was tired, ___?|wasn't he|wasn't he/didn't he/isn't he","You don't smoke, ___?|do you|do you/don't you/are you","They live here, ___?|don't they|don't they/aren't they/doesn't they","You'd like a drink, ___?|wouldn't you|wouldn't you/didn't you/hadn't you","He never eats meat, ___?|does he|does he/doesn't he/is he","Your parents were there, ___?|weren't they|weren't they/didn't they/wasn't they","She had already left, ___?|hadn't she|hadn't she/didn't she/wasn't she"]],
+["C1","Conditionnels mixtes",["If I had studied medicine, I ___ a doctor now.|would be|would be/would have been/will be","If she weren't so shy, she ___ to the party last night.|would have gone|would go/would have gone/went","If we hadn't missed the plane, we ___ in Rome now.|would be|would be/would have been/were","If he ___ more careful by nature, he wouldn't have had the accident.|were|were/is/will be","If I ___ breakfast this morning, I wouldn't be hungry now.|had eaten|ate/had eaten/would eat","If I spoke French, I ___ the job last year.|would have got|would get/would have got/got","If you had taken the medicine, you ___ better now.|would feel|would feel/would have felt/will feel","If she ___ the lottery last week, she wouldn't be working here today.|had won|won/had won/would win","If I weren't afraid of heights, I ___ the tower yesterday.|would have climbed|would climb/would have climbed/climbed","If they had saved money, they ___ rich now.|would be|would be/would have been/are","If the bus had come on time, we ___ at school now.|would be|would be/would have been/are","We ___ lost now if you had brought the map. (négatif)|wouldn't be~would not be","If I had gone to bed earlier, I ___ so tired now. (négatif)|wouldn't be~would not be","If I hadn't met her, I ___ married now. (négatif)|wouldn't be~would not be","If he were a better driver, he ___ the test last week.|would have passed|would pass/would have passed/passed","If I had learned to swim as a child, I ___ afraid of water today.|wouldn't be|wouldn't be/wouldn't have been/won't be","If she ___ always so busy, she would have called you yesterday.|weren't|weren't/isn't/won't be","If they hadn't moved, they ___ our neighbours now.|would still be|would still be/would still have been/will still be","If it hadn't snowed last night, the roads ___ dangerous now. (négatif)|wouldn't be~would not be","If I didn't love you, I ___ you all this way yesterday.|wouldn't have followed|wouldn't follow/wouldn't have followed/didn't follow"]],
+["C1","Ordre des adjectifs et adjectifs composés",["She bought a ___ table.|beautiful old wooden|old beautiful wooden/beautiful old wooden/wooden old beautiful","He has a ___ car.|small red Italian|red small Italian/small red Italian/Italian small red","They live in a ___ house.|big old|old big/big old","She wore a ___ dress.|lovely long silk|long lovely silk/lovely long silk/silk long lovely","I need a ___ bag.|large black leather|black large leather/large black leather/leather large black","It was a ___ walk.|ten-minute|ten-minutes/ten-minute/ten minute's","He's a ___ boy.|five-year-old|five-years-old/five-year-old/five-year-olds","She is a ___ actress.|well-known|well-knowing/well-known/good-known","We took a ___ flight.|two-hour|two-hours/two-hour/two hour's","He's a ___ man. (aux yeux bleus)|blue-eyed|blue-eyes/blue-eyed/blue-eye","The film was so ___ that I fell asleep.|boring|bored/boring","I was ___ by the news.|surprised|surprised/surprising","It's a ___ story.|fascinating|fascinated/fascinating","She felt ___ after the long trip.|exhausted|exhausted/exhausting","He bought a ___ sofa.|comfortable new grey|new comfortable grey/comfortable new grey/grey new comfortable","They have a ___ cat.|cute little black|little cute black/cute little black/black cute little","She has ___ hair.|long curly brown|brown long curly/long curly brown/curly brown long","She's a ___ woman. (qui travaille dur)|hard-working|hard-worked/hard-working/hardly-working","They live in a ___ apartment.|nice modern French|modern nice French/nice modern French/French nice modern","I'm ___ in history.|interested|interested/interesting"]],
+["C2","Propositions participiales",["___ tired, she went to bed early.|Feeling|Feeling/Felt/Feel","___ her homework, she went out. (après avoir fini)|Having finished|Finishing/Having finished/Finished","___ in 1900, the house needs repairs.|Built|Building/Built/Having building","The man ___ next to the door is my uncle.|standing|standing/stood/who standing","The books ___ by this author are very popular.|written|writing/written/wrote","___ the news, he called his mother. (après avoir entendu)|Having heard|Heard/Having heard/Being heard","___ English, she understood the film. (parce qu'elle parle)|Speaking|Speaking/Spoken/Speak","While ___ home, I saw an accident.|walking|walking/walked/walk","___ by the noise, the baby started crying.|Frightened|Frightening/Frightened/Having frightening","Not ___ what to do, she called the police.|knowing|knowing/known/know","Anyone ___ to join should contact us.|wishing|wishing/wished/wishes","___ been warned, they took an umbrella.|Having|Having/Being/Had","The car ___ in the street belongs to my boss.|parked|parking/parked/park","___ all his money, he had to walk home.|Having spent|Spending/Having spent/Spent","Students ___ the exam must stay quiet.|taking|taking/taken/took","___ from a distance, the island looks small.|Seen|Seeing/Seen/Having seeing","After ___ dinner, we watched a film.|having|having/had/have","___ the door, she found a letter on the floor.|Opening|Opening/Opened/Being opened","The weather ___ fine, we went for a walk.|being|being/been/was","There were many people ___ for the bus.|waiting|waiting/waited/wait"]]
+);
+TH[37]=`<h3>Futur continu : will be + -ing</h3>`+tb(['Emploi','Exemple'],[['Action en cours à un moment précis du futur',e('This time tomorrow, I will be lying on a beach.')],['Action prévue, naturelle',e("I'll be seeing him at work anyway.")],['Question polie sur les projets',e('Will you be using the car tonight?')]])+`<h3>Futur antérieur : will have + participe passé</h3>`+tb(['Emploi','Exemple'],[['Action terminée avant un moment futur',e('By 2030, they will have built the stadium.')],['Durée jusqu\'à un moment futur',e('By June, she will have worked here for ten years.')],['Négatif',e("I won't have finished by 6.")]])+bx(`Mots repères : <b>by</b> + moment (by Friday, by next year), <b>by the time</b> + présent : ${e('By the time you arrive, I will have left.')}<br>Après <i>by the time / when</i>, jamais de <i>will</i>.`,'warn')+bx(`Moyen simple : <b>en cours</b> à ce moment → futur continu ; <b>déjà fini</b> à ce moment → futur antérieur.`,'tip');
+TH[38]=`<h3>Verbes suivis de -ing</h3>`+tb(['Verbes','Exemple'],[['enjoy, avoid, finish, mind, keep, suggest, practise',e('I enjoy listening to music.')],["can't stand, give up, look forward to",e("I can't stand waiting.")],['après une préposition (in, at, of, about, without…)',e("I'm good at drawing.")],['comme sujet de la phrase',e('Swimming is good for you.')]])+`<h3>Verbes suivis de to + base</h3>`+tb(['Verbes','Exemple'],[['want, decide, hope, plan, refuse, promise, agree',e('She decided to buy a car.')],["learn, need, would like, manage, offer",e("I'd like to visit Japan.")],['adjectif + to',e("It's easy to learn.")],['négatif : not to',e('He promised not to be late.')]])+`<h3>Le sens change !</h3>`+tb(['Verbe','+ -ing','+ to'],[['stop',e('I stopped smoking.')+' (j\'ai arrêté de fumer)',e('I stopped to smoke.')+' (je me suis arrêté pour fumer)'],['remember',e('I remember meeting him.')+' (souvenir du passé)',e('Remember to lock the door.')+' (ne pas oublier de)'],['forget',e("I'll never forget seeing it.")+' (souvenir)',e("Don't forget to call.")+' (oublier de faire)'],['try',e('Try adding salt.')+' (tester)',e('I tried to open it.')+' (essayer, effort)']])+bx(`<i>look forward to</i>, <i>be used to</i> : ici <b>to</b> est une préposition, donc <b>-ing</b> : ${e('I look forward to seeing you.')}`,'warn');
+TH[39]=`<h3>Formation : have / has been + -ing</h3>`+tb(['','Forme','Exemple'],[['Affirmatif','have/has been + -ing',e("I've been waiting for an hour.")],['Négatif',"haven't/hasn't been + -ing",e("She hasn't been sleeping well.")],['Question','Have/Has + sujet + been + -ing',e('How long have you been learning English?')]])+`<h3>Quand l'utiliser</h3>`+ls([`Activité qui dure jusqu'à maintenant : ${e("It's been raining all day.")}`,`Activité récente avec un résultat visible : ${e("Your eyes are red. Have you been crying?")}`])+`<h3>Simple ou continu ?</h3>`+tb(['','Present perfect simple','Present perfect continu'],[['Accent sur','le résultat, la quantité','l\'activité, la durée'],['Exemple',e("I've written three letters."),e("I've been writing letters all morning.")],['Exemple',e("Someone has eaten my chocolate!")+' (il n\'en reste plus)',e("Have you been eating chocolate?")+' (traces sur la bouche)']])+bx(`Pas de forme continue avec les verbes d'état (know, have = posséder, like, believe) : ❌ <i>I've been knowing him</i> ✅ ${e("I've known him for years.")}`,'warn');
+TH[40]=`<h3>Principe</h3><p>Une petite question à la fin de la phrase pour vérifier ou demander l'accord : « n'est-ce pas ? ». On reprend l'<b>auxiliaire</b> et le <b>pronom</b> sujet.</p>`+tb(['Phrase','Tag','Exemple'],[['affirmative','négatif',e("You're French, aren't you?")],['négative','affirmatif',e("They didn't come, did they?")],['sans auxiliaire (présent)',"don't / doesn't",e("She likes tea, doesn't she?")],['sans auxiliaire (passé)',"didn't",e("He called, didn't he?")]])+`<h3>Cas particuliers</h3>`+tb(['Phrase','Tag'],[[e("I'm late"),e("aren't I?")],[e("Let's go"),e('shall we?')],[e('Close the door'),e('will you?')],[e('There is a problem'),e("isn't there?")],[e('Nobody / everybody called'),e('did they? / didn\'t they?')],[e('He never eats meat'),e('does he?')+' (never = négatif)']])+bx(`Intonation <b>descendante</b> : on attend un « oui ». Intonation <b>montante</b> : vraie question, on n'est pas sûr.`,'tip');
+TH[41]=`<h3>Deux combinaisons</h3>`+tb(['Condition','Résultat','Exemple'],[['passé (If + past perfect)','présent (would + base)',e('If I had studied medicine, I would be a doctor now.')],['présent permanent (If + past simple)','passé (would have + participe)',e("If she weren't so shy, she would have gone to the party.")]])+`<h3>Comment les reconnaître</h3>`+ls([`Cherche les repères de temps : ${e('now, today')} → résultat présent ; ${e('yesterday, last week')} → résultat passé.`,`Si la condition est un <b>trait permanent</b> (caractère, compétence), on garde le passé simple : ${e('If I spoke French…')}`])+bx(`Comparaison :<br>Conditionnel 3 : ${e("If I had taken the job, I would have moved.")} (tout est passé)<br>Mixte : ${e("If I had taken the job, I would live in Paris now.")} (cause passée, conséquence présente)`,'tip');
+TH[42]=`<h3>Ordre des adjectifs devant le nom</h3>`+tb(['Ordre','Catégorie','Exemples'],[['1','opinion','beautiful, lovely, nice, ugly'],['2','taille','big, small, long, tall'],['3','âge','old, new, young, modern'],['4','forme','round, square, flat'],['5','couleur','red, black, grey'],['6','origine','French, Italian, Chinese'],['7','matière','wooden, silk, leather'],['8','but (+ nom)','a <b>running</b> shoe, a <b>sleeping</b> bag']])+bx(`${e('a beautiful old wooden table')} · ${e('a small red Italian car')} · ${e('long curly brown hair')}<br>En pratique on évite d'en mettre plus de trois.`,'tip')+`<h3>Adjectifs composés</h3>`+tb(['Type','Exemple'],[['nombre + nom (singulier !)',e('a ten-minute walk, a five-year-old boy')],['adverbe + participe',e('a well-known actor, a badly-paid job')],['adjectif + nom + -ed',e('a blue-eyed man, a left-handed player')],['adjectif + participe présent',e('a hard-working woman, a good-looking man')]])+bx(`Pas de -s dans l'adjectif composé : ❌ <i>a ten-minutes walk</i> ✅ ${e('a ten-minute walk')}.`,'warn')+`<h3>-ed ou -ing ?</h3>`+bx(`<b>-ing</b> = ce qui provoque l'effet : ${e('The film was boring.')}<br><b>-ed</b> = ce qu'on ressent : ${e('I was bored.')}`);
+TH[43]=`<h3>Les trois participes</h3>`+tb(['Forme','Sens','Exemple'],[['Participe présent (-ing)','action simultanée ou cause, sens actif',e('Feeling tired, she went to bed.')],['Participe parfait (having + participe)','action terminée avant',e('Having finished her work, she went out.')],['Participe passé','sens passif',e('Built in 1900, the house needs repairs.')]])+`<h3>Relatives réduites</h3>`+tb(['Relative complète','Forme réduite'],[[e('The man who is standing there…'),e('The man standing there…')],[e('The books which were written by her…'),e('The books written by her…')],[e('Anyone who wishes to join…'),e('Anyone wishing to join…')]])+`<h3>Autres structures</h3>`+ls([`Avec conjonction : ${e('While walking home, I saw an accident.')} · ${e('After having dinner, we left.')}`,`Négation : ${e('Not knowing what to do, she called the police.')}`,`Sujet propre (absolu) : ${e('The weather being fine, we went out.')}`])+bx(`Le sujet du participe doit être le même que celui de la phrase principale.<br>❌ <i>Walking home, the rain started.</i> (la pluie ne marche pas !) ✅ ${e('Walking home, I got caught in the rain.')}`,'warn');
+[37,38,39,40,41,42,43].forEach(i=>FULL.add(i));
+
+// ===== Entraînement : verbes irréguliers =====
+const IRR=`be:was~were~was/were~was / were:been:être
+have:had:had:avoir
+do:did:done:faire
+go:went:gone:aller
+come:came:come:venir
+see:saw:seen:voir
+take:took:taken:prendre
+make:made:made:fabriquer, faire
+get:got:got~gotten:obtenir
+give:gave:given:donner
+say:said:said:dire
+tell:told:told:raconter
+know:knew:known:savoir, connaître
+think:thought:thought:penser
+buy:bought:bought:acheter
+bring:brought:brought:apporter
+eat:ate:eaten:manger
+drink:drank:drunk:boire
+write:wrote:written:écrire
+read:read:read:lire
+speak:spoke:spoken:parler
+sleep:slept:slept:dormir
+meet:met:met:rencontrer
+leave:left:left:partir, quitter
+find:found:found:trouver
+lose:lost:lost:perdre
+pay:paid:paid:payer
+run:ran:run:courir
+drive:drove:driven:conduire
+ride:rode:ridden:monter (à vélo, à cheval)
+sit:sat:sat:s'asseoir
+put:put:put:mettre
+cut:cut:cut:couper
+let:let:let:laisser
+hit:hit:hit:frapper
+cost:cost:cost:coûter
+hurt:hurt:hurt:blesser, faire mal
+shut:shut:shut:fermer
+begin:began:begun:commencer
+break:broke:broken:casser
+choose:chose:chosen:choisir
+forget:forgot:forgotten:oublier
+forgive:forgave:forgiven:pardonner
+fly:flew:flown:voler (avion, oiseau)
+grow:grew:grown:grandir, pousser
+throw:threw:thrown:lancer
+know:knew:known:savoir
+swim:swam:swum:nager
+sing:sang:sung:chanter
+ring:rang:rung:sonner
+wear:wore:worn:porter (un vêtement)
+steal:stole:stolen:voler (dérober)
+win:won:won:gagner
+teach:taught:taught:enseigner
+catch:caught:caught:attraper
+fight:fought:fought:se battre
+feel:felt:felt:ressentir
+keep:kept:kept:garder
+send:sent:sent:envoyer
+spend:spent:spent:dépenser, passer (du temps)
+lend:lent:lent:prêter
+build:built:built:construire
+hear:heard:heard:entendre
+hold:held:held:tenir
+stand:stood:stood:être debout
+understand:understood:understood:comprendre
+sell:sold:sold:vendre
+fall:fell:fallen:tomber
+hide:hid:hidden:cacher
+bite:bit:bitten:mordre
+shake:shook:shaken:secouer
+draw:drew:drawn:dessiner
+show:showed:shown~showed:montrer
+become:became:become:devenir
+freeze:froze:frozen:geler
+rise:rose:risen:se lever (soleil, prix)
+shoot:shot:shot:tirer
+mean:meant:meant:signifier
+lead:led:led:mener
+learn:learnt~learned:learnt~learned:apprendre
+dream:dreamt~dreamed:dreamt~dreamed:rêver
+burn:burnt~burned:burnt~burned:brûler`.trim().split('\n').filter((l,i,a)=>a.findIndex(x=>x.split(':')[0]===l.split(':')[0])===i).map(l=>{const p=l.split(':');return{b:p[0],p:p[1].split('~'),pp:p[2].split('~'),fr:p[3]}});
+const fm=a=>a.filter(x=>!x.includes('/')).join(' / ');
+function irr(){
+ setSec('exo');const qs=shuf(IRR).slice(0,15);let i=0,sc=0;const miss=[];
+ function step(){
+  if(i>=qs.length){
+   if(sc>(+get('irr')||0))set('irr',sc);
+   app.innerHTML=`<button class="back" id="bk">← Exercices</button><h1>Verbes irréguliers</h1><div class="q"><div class="s">Score : ${sc} / ${qs.length}</div><p>${sc===qs.length?'Parfait !':sc>=qs.length*.7?'Très bien, encore un petit effort.':'Relis le tableau des verbes irréguliers et recommence.'}</p><p><button class="go" id="again">Recommencer</button></p></div>`+(miss.length?`<div class="rv"><h2>À revoir</h2><div class="q th">${tb(['Base','Prétérit','Participe','Français'],miss.map(v=>[e(v.b),fm(v.p),fm(v.pp),v.fr]))}</div></div>`:'');
+   document.getElementById('bk').onclick=home;document.getElementById('again').onclick=irr;window.scrollTo(0,0);return}
+  const v=qs[i];
+  app.innerHTML=`<button class="back" id="bk">← Exercices</button><h1>Verbes irréguliers</h1><div class="bar"><i style="width:${i/qs.length*100}%"></i></div><p>Verbe ${i+1} / ${qs.length}</p><div class="q"><div class="s"><span class="en">${v.b}</span> <button class="sp" id="say" aria-label="Écouter">🔊</button><br><small style="color:var(--mute);font-weight:700">${v.fr}</small></div><div class="irr"><label>Prétérit<input id="p1" autocomplete="off" autocapitalize="off"></label><label>Participe passé<input id="p2" autocomplete="off" autocapitalize="off"></label></div><p style="margin-top:12px"><button class="go" id="ok">Valider</button></p><div class="fb" id="fb"></div><div id="nx"></div></div>`;
+  document.getElementById('bk').onclick=home;
+  document.getElementById('say').onclick=()=>{if('speechSynthesis' in window){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(v.b);u.lang='en-GB';speechSynthesis.speak(u)}};
+  const p1=document.getElementById('p1'),p2=document.getElementById('p2'),ok=document.getElementById('ok'),fb=document.getElementById('fb'),nx=document.getElementById('nx');p1.focus();
+  const val=()=>{if(!p1.value.trim()||!p2.value.trim())return;
+   const g1=v.p.map(norm).includes(norm(p1.value)),g2=v.pp.map(norm).includes(norm(p2.value));
+   p1.classList.add(g1?'ok':'ko');p2.classList.add(g2?'ok':'ko');p1.disabled=p2.disabled=ok.disabled=true;
+   if(g1&&g2)sc++;else miss.push(v);
+   fb.style.color=g1&&g2?'var(--ok)':'var(--ko)';fb.textContent=g1&&g2?'Correct !':`Réponse : ${v.b} – ${fm(v.p)} – ${fm(v.pp)}`;
+   nx.innerHTML=`<button class="go" id="n">${i+1<qs.length?'Suivant':'Voir le score'}</button>`;const n=document.getElementById('n');n.onclick=()=>{i++;step()};n.focus()};
+  ok.onclick=val;p1.onkeydown=ev=>{if(ev.key==='Enter')p2.focus()};p2.onkeydown=ev=>{if(ev.key==='Enter')val()};
+ }
+ step();window.scrollTo(0,0);
+}
+
+// ===== Entraînement : phrases à remettre dans l'ordre =====
+const SO=[
+["A1","I am twelve years old."],["A1","She has a black cat."],["A1","We live in a small house."],["A1","My brother plays football on Sundays.","On Sundays my brother plays football"],["A1","Do you like chocolate?"],["A1","There are two chairs in the kitchen.","In the kitchen there are two chairs"],["A1","He doesn't speak Spanish."],["A1","Where is the bus stop?"],["A1","They are at school today.","Today they are at school"],["A1","Can you help me?"],["A1","What is your name?"],["A1","I don't have a car."],
+["A2","I went to the cinema yesterday.","Yesterday I went to the cinema"],["A2","She is reading a very good book."],["A2","Did you see the match last night?"],["A2","We are going to visit our grandparents."],["A2","My bag is heavier than yours."],["A2","There isn't any milk in the fridge."],["A2","How many brothers do you have?"],["A2","It was very cold last winter.","Last winter it was very cold"],["A2","I don't think she will come."],["A2","They didn't watch the film."],["A2","What did you do at the weekend?"],["A2","He usually goes to work by bus."],
+["B1","I have never been to Japan."],["B1","She has lived here since 2015."],["B1","If it rains we will stay at home.","We will stay at home if it rains"],["B1","You should see a doctor."],["B1","The man who lives next door is a pilot."],["B1","This bridge was built in 1890.","In 1890 this bridge was built"],["B1","I was cooking when you called.","When you called I was cooking"],["B1","He said that he was tired."],["B1","I used to play the piano."],["B1","Have you finished your homework yet?"],["B1","You mustn't use your phone in class.","In class you mustn't use your phone"],["B1","She asked me where I lived."],
+["B2","If I had known I would have helped you.","I would have helped you if I had known"],["B2","I wish I had more free time."],["B2","She must have forgotten our meeting."],["B2","I'm looking forward to seeing you."],["B2","They have been waiting for two hours."],["B2","By next year I will have finished my studies.","I will have finished my studies by next year"],["B2","You're coming with us aren't you?"],["B2","He avoided answering the question."],["B2","I had my car repaired last week.","Last week I had my car repaired"],["B2","The report must be finished by Friday.","By Friday the report must be finished"],["B2","She can't have seen us."],["B2","We stopped to buy some water."],
+["C1","Never have I seen such a beautiful view."],["C1","Not only was he late but he also forgot the tickets."],["C1","Had I known the truth I would have left.","I would have left had I known the truth"],["C1","Despite the rain we enjoyed the trip.","We enjoyed the trip despite the rain"],["C1","If I had studied harder I would be a doctor now.","I would be a doctor now if I had studied harder"],["C1","Little did she know what was about to happen."],["C1","Only then did I realise my mistake."],["C1","Rarely do we see such talent."],["C1","She bought a beautiful old wooden table."],["C1","Under no circumstances should you open this door."],["C1","Hardly had we arrived when it started to rain."],["C1","Should you need any help please call me.","Please call me should you need any help"],
+["C2","What I need most is a long holiday.","A long holiday is what I need most"],["C2","It was my sister who found the solution."],["C2","The committee insisted that he resign."],["C2","Having finished the report she went home.","She went home having finished the report"],["C2","Were it not for your help I would have failed.","I would have failed were it not for your help"],["C2","Not until the next morning did they notice."],["C2","The more you read the more you learn.","The more you learn the more you read"],["C2","It is essential that every student be present."],["C2","Seen from above the city looks tiny.","The city looks tiny seen from above"],["C2","So difficult was the exam that nobody passed."],["C2","I would rather you didn't tell anyone."],["C2","All she wanted was a little peace.","A little peace was all she wanted"]
+];
+const onorm=s=>s.toLowerCase().replace(/[.,?!]/g,'').replace(/\s+/g,' ').trim();
+function ohome(){
+ setSec('exo');
+ const lv=['A1','A2','B1','B2','C1','C2'];
+ app.innerHTML=`<button class="back" id="bk">← Exercices</button><h1>Phrases en désordre</h1><p>Touche les mots dans le bon ordre pour reconstruire la phrase. Touche un mot placé pour le retirer.</p><div class="grid" style="margin-top:14px">${lv.map(l=>{const b=get('o'+l);return`<button class="t l-${l} ${b?'done':''}" data-o="${l}"><span>Niveau ${l}</span><small>${b?b+'/10':'10 phrases'}</small></button>`}).join('')}</div>`;
+ document.getElementById('bk').onclick=home;
+ app.querySelectorAll('[data-o]').forEach(b=>b.onclick=()=>order(b.dataset.o));
+ window.scrollTo(0,0);
+}
+function order(l){
+ setSec('exo');const qs=shuf(SO.filter(s=>s[0]===l)).slice(0,10);let i=0,sc=0;const miss=[];
+ function step(){
+  if(i>=qs.length){
+   if(sc>(+get('o'+l)||0))set('o'+l,sc);
+   app.innerHTML=`<button class="back" id="bk">← Phrases</button><h1>Phrases ${l}</h1><div class="q"><div class="s">Score : ${sc} / ${qs.length}</div><p>${sc===qs.length?'Parfait !':sc>=qs.length*.7?'Très bien, encore un petit effort.':'Recommence pour mieux retenir l\'ordre des mots.'}</p><p><button class="go" id="again">Recommencer</button></p></div>`+(miss.length?`<div class="rv"><h2>À revoir</h2>${miss.map(m=>`<div class="q"><p>Ta phrase : <span class="k">${m.g}</span><br>Bonne phrase : <span class="g">${m.s}</span></p></div>`).join('')}</div>`:'');
+   document.getElementById('bk').onclick=ohome;document.getElementById('again').onclick=()=>order(l);window.scrollTo(0,0);return}
+  const s=qs[i][1],end=s.slice(-1),alts=[s,...qs[i].slice(2)].map(onorm);
+  const words=s.slice(0,-1).split(' ').map((w,k)=>k===0&&!/^I('|$)/.test(w)?w[0].toLowerCase()+w.slice(1):w);
+  let pool=words.map((w,k)=>({w,k})),ans=[],done=false;
+  do{pool=shuf(pool)}while(pool.length>2&&pool.map(x=>x.w).join(' ')===words.join(' '));
+  app.innerHTML=`<button class="back" id="bk">← Phrases</button><h1>Phrases ${l}</h1><div class="bar"><i style="width:${i/qs.length*100}%"></i></div><p>Phrase ${i+1} / ${qs.length}</p><div class="q"><div class="ans" id="ans"></div><div class="wd" id="pool"></div><p style="margin-top:14px"><button class="go" id="ok" disabled>Vérifier</button> <button class="back" id="clr" style="margin:0 0 0 6px">Effacer</button></p><div class="fb" id="fb"></div><div id="nx"></div></div>`;
+  document.getElementById('bk').onclick=ohome;
+  const A=document.getElementById('ans'),P=document.getElementById('pool'),ok=document.getElementById('ok'),fb=document.getElementById('fb'),nx=document.getElementById('nx');
+  const cap=t=>t?t[0].toUpperCase()+t.slice(1):t;
+  function draw(){
+   A.innerHTML=ans.length?ans.map((x,j)=>`<button data-a="${j}">${j===0?cap(x.w):x.w}</button>`).join('')+`<span class="pt">${end}</span>`:'<span class="ph">Touche les mots ci-dessous…</span>';
+   P.innerHTML=pool.map((x,j)=>`<button data-p="${j}">${x.w}</button>`).join('');
+   ok.disabled=done||pool.length>0;
+   if(done)return;
+   A.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{pool.push(...ans.splice(+b.dataset.a,1));draw()});
+   P.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{ans.push(...pool.splice(+b.dataset.p,1));draw()});
+  }
+  draw();
+  document.getElementById('clr').onclick=()=>{if(done)return;pool.push(...ans);ans=[];draw()};
+  ok.onclick=()=>{const g=cap(ans.map(x=>x.w).join(' '))+end,good=alts.includes(onorm(g));done=true;draw();
+   A.classList.add(good?'ok':'ko');if(good)sc++;else miss.push({g,s});
+   fb.style.color=good?'var(--ok)':'var(--ko)';fb.innerHTML=good?'Correct !':`Bonne phrase : <span class="en">${s}</span>`;
+   if('speechSynthesis' in window){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(s);u.lang='en-GB';speechSynthesis.speak(u)}
+   nx.innerHTML=`<button class="go" id="n">${i+1<qs.length?'Suivant':'Voir le score'}</button>`;const n=document.getElementById('n');n.onclick=()=>{i++;step()};n.focus()};
+ }
+ step();window.scrollTo(0,0);
+}
 
 const R=[
 ["A1","My name is Lisa","My name is Lisa. I am 12 years old. I am from Belgium. I live in a small house with my mother, my father and my brother. I have a cat. Her name is Mimi.",["Quel âge a Lisa ?|12 ans|10 ans/12 ans/15 ans|I am 12 years old","Qui est Mimi ?|Son chat|Sa sœur/Son chat/Sa mère|I have a cat. Her name is Mimi"]],
