@@ -87,7 +87,11 @@ details.q summary{cursor:pointer;font-weight:800;color:var(--acc)}
 .wd{display:flex;flex-wrap:wrap;gap:8px}
 .ans button,.wd button{border:2px solid var(--line);background:var(--card);border-radius:12px;padding:9px 13px;font-weight:700;box-shadow:0 3px 0 var(--line)}
 .ans button{border-color:var(--acc)}.ans .ph{color:var(--mute)}.ans .pt{font-weight:800;font-size:1.2rem}
-</style></head><body><nav id="nav"><button data-n="theo"><i>📘</i>Théorie</button><button data-n="exo"><i>✏️</i>Exercices</button><button data-n="voc"><i>🗂️</i>Vocabulaire</button><button data-n="lec"><i>📖</i>Lecture</button></nav><main id="app"></main>
+.cjf{display:flex;gap:12px;flex-wrap:wrap}.cjf label{display:flex;flex-direction:column;gap:4px;font-weight:800;color:var(--mute);flex:1;min-width:130px}
+.cjf select{font:inherit;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:8px;padding:9px 12px}.q .cjf input{max-width:none}
+.lv.tg-pr{background:#12b886}.lv.tg-pa{background:#e17055}.lv.tg-fu{background:#0984e3}.lv.tg-co{background:#8e44ad}
+.tcard p{color:var(--ink)}
+</style></head><body><nav id="nav"><button data-n="theo"><i>📘</i>Théorie</button><button data-n="tps"><i>⏳</i>Temps</button><button data-n="exo"><i>✏️</i>Exercices</button><button data-n="voc"><i>🗂️</i>Vocabulaire</button><button data-n="lec"><i>📖</i>Lecture</button></nav><main id="app"></main>
 <script>
 const D=[
 ["A1","To be",["I ___ from Belgium.|am|am/is/are","She ___ my sister.|is|is/are/am","They ___ at school.|are|is/are/am","He ___ a student. (négatif)|isn't~is not","___ you hungry? (question)|Are"]],
@@ -132,6 +136,7 @@ const parse=s=>{const p=s.split('|');return{q:p[0],a:p[1].split('~'),o:p[2]?p[2]
 function home(){
  if(sec==='lec')return lhome();
  if(sec==='voc')return vhome();
+ if(sec==='tps')return thome();
  const lv=['A1','A2','B1','B2','C1','C2'],n=D.reduce((c,d)=>c+d[2].length,0);
  setSec(sec);
  let h=sec==='exo'?`<h1>Exercices</h1><p>${D.length} séries, ${n} exercices corrigés tout de suite. Choisis une série ou un test mixte.</p>`:`<h1>Théorie</h1><p>${D.length} fiches de cours avec règles et exemples. Ouvre une fiche, puis passe aux exercices.</p>`;if(sec==='exo'){const bi=get('irr');h+=`<h2>Entraînements spéciaux</h2><div class="grid"><button class="t ${bi?'done':''}" id="xirr" style="--c:#e17055"><span>🔤 Verbes irréguliers</span><small>${bi?bi+'/15':'15 verbes'}</small></button><button class="t" id="xord" style="--c:#00b894"><span>🧩 Phrases en désordre</span><small>6 niveaux</small></button></div><h2>Séries de grammaire</h2>`}
@@ -346,10 +351,10 @@ function vhome(){
 }
 function vtheme(i){
  const w=vp(i);
- app.innerHTML=`<button class="back" id="bk">← Vocabulaire</button><h1>${V[i][0]} ${V[i][1]}</h1><div class="q th"><div class="sc"><table><tr><th>English</th><th>Français</th><th></th></tr>${w.map(x=>`<tr><td class="en">${x.en}</td><td>${x.fr}</td><td><button class="sp" data-w="${x.en}" aria-label="Écouter ${x.en}">🔊</button></td></tr>`).join('')}</table></div></div><p style="margin-top:16px"><button class="go" id="vt">Se tester (10 mots)</button></p>`;
+ app.innerHTML=`<button class="back" id="bk">← Vocabulaire</button><h1>${V[i][0]} ${V[i][1]}</h1>${VN[V[i][1]]||''}<div class="q th"><div class="sc"><table><tr><th>English</th><th>Français</th><th></th></tr>${w.map(x=>`<tr><td class="en">${x.en}</td><td>${x.fr}</td><td><button class="sp" data-w="${x.en}" aria-label="Écouter ${x.en}">🔊</button></td></tr>`).join('')}</table></div></div><p style="margin-top:16px"><button class="go" id="vt">Se tester (10 mots)</button></p>`;
  document.getElementById('bk').onclick=vhome;
  document.getElementById('vt').onclick=()=>vquiz(V[i][1],w,'v'+i);
- app.querySelectorAll('.sp').forEach(b=>b.onclick=()=>{if('speechSynthesis' in window){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(b.dataset.w.replace(/^to /,''));u.lang='en-GB';speechSynthesis.speak(u)}});
+ app.querySelectorAll('.sp').forEach(b=>b.onclick=()=>{if('speechSynthesis' in window){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(b.dataset.w.replace(/^to /,'').replace(/[·\/]/g,','));u.lang='en-GB';speechSynthesis.speak(u)}});
  window.scrollTo(0,0);
 }
 
@@ -647,6 +652,392 @@ const TH2=[
 `<h3>L'accent tonique</h3><p>Dans chaque mot de plusieurs syllabes, une syllabe est plus forte. Se tromper peut rendre le mot incompréhensible.</p>`+tb(['Mot','Accent'],[['photograph','<b>PHO</b>tograph'],['photographer','pho<b>TO</b>grapher'],['hotel','ho<b>TEL</b>'],['computer','com<b>PU</b>ter'],['important','im<b>POR</b>tant'],['a record / to record','a <b>RE</b>cord (nom) / to re<b>CORD</b> (verbe)']])+`<h3>Les sons difficiles pour un francophone</h3>`+tb(['Son','Exemples','Astuce'],[['th sourd','think, three, month','langue entre les dents, souffle'],['th sonore','this, mother, they','langue entre les dents, voix'],['h aspiré','house, happy, hello','souffle comme sur une vitre (mais <b>hour, honest</b> : h muet)'],['i long / i court','sheep / ship, leave / live','long = « ii », court = entre « i » et « é »']])+`<h3>Le -ed du passé</h3>`+tb(['Son','Après','Exemples'],[['t','p, k, f, s, sh, ch','worked, washed'],['d','voyelle et autres consonnes','played, opened'],['id','t, d','wanted, needed']])+bx(`Lettres muettes : <b>k</b>nife, lis<b>t</b>en, i<b>s</b>land, We<b>d</b>nesday, ca<b>l</b>m, <b>w</b>rite.<br>L'orthographe ne dit pas toujours le son : through / though / rough se prononcent tous différemment !`,'warn')
 ];
 TH2.forEach((t,k)=>{TH[D0+k]=t;FULL.add(D0+k)});
+
+// ===== Vocabulaire : listes complètes des verbes =====
+const IRR_ALL=`arise:arose:arisen:survenir
+awake:awoke:awoken:s'éveiller
+be:was~were:been:être
+bear:bore:borne~born:supporter / porter
+beat:beat:beaten:battre
+become:became:become:devenir
+begin:began:begun:commencer
+bend:bent:bent:plier / se pencher
+bet:bet:bet:parier
+bind:bound:bound:lier / attacher
+bite:bit:bitten:mordre
+bleed:bled:bled:saigner
+blow:blew:blown:souffler
+break:broke:broken:casser
+breed:bred:bred:élever (des animaux)
+bring:brought:brought:apporter
+broadcast:broadcast:broadcast:diffuser
+build:built:built:construire
+burn:burnt~burned:burnt~burned:brûler
+burst:burst:burst:éclater
+buy:bought:bought:acheter
+cast:cast:cast:jeter / attribuer un rôle
+catch:caught:caught:attraper
+choose:chose:chosen:choisir
+cling:clung:clung:s'accrocher
+come:came:come:venir
+cost:cost:cost:coûter
+creep:crept:crept:ramper
+cut:cut:cut:couper
+deal:dealt:dealt:traiter / distribuer
+dig:dug:dug:creuser
+do:did:done:faire
+draw:drew:drawn:dessiner / tirer
+dream:dreamt~dreamed:dreamt~dreamed:rêver
+drink:drank:drunk:boire
+drive:drove:driven:conduire
+eat:ate:eaten:manger
+fall:fell:fallen:tomber
+feed:fed:fed:nourrir
+feel:felt:felt:ressentir / se sentir
+fight:fought:fought:se battre
+find:found:found:trouver
+flee:fled:fled:fuir
+fling:flung:flung:lancer violemment
+fly:flew:flown:voler (avion / oiseau)
+forbid:forbade:forbidden:interdire
+forecast:forecast:forecast:prévoir
+forget:forgot:forgotten:oublier
+forgive:forgave:forgiven:pardonner
+freeze:froze:frozen:geler
+get:got:got~gotten:obtenir / devenir
+give:gave:given:donner
+go:went:gone:aller
+grind:ground:ground:moudre
+grow:grew:grown:grandir / pousser
+hang:hung:hung:accrocher / suspendre
+have:had:had:avoir
+hear:heard:heard:entendre
+hide:hid:hidden:cacher
+hit:hit:hit:frapper
+hold:held:held:tenir
+hurt:hurt:hurt:blesser / faire mal
+keep:kept:kept:garder
+kneel:knelt~kneeled:knelt~kneeled:s'agenouiller
+know:knew:known:savoir / connaître
+lay:laid:laid:poser / mettre (la table)
+lead:led:led:mener / diriger
+lean:leant~leaned:leant~leaned:s'appuyer / se pencher
+leap:leapt~leaped:leapt~leaped:bondir
+learn:learnt~learned:learnt~learned:apprendre
+leave:left:left:partir / quitter
+lend:lent:lent:prêter
+let:let:let:laisser / permettre
+lie:lay:lain:être allongé
+light:lit~lighted:lit~lighted:allumer
+lose:lost:lost:perdre
+make:made:made:fabriquer / faire
+mean:meant:meant:signifier / vouloir dire
+meet:met:met:rencontrer
+mistake:mistook:mistaken:confondre
+overcome:overcame:overcome:surmonter
+pay:paid:paid:payer
+prove:proved:proven~proved:prouver
+put:put:put:mettre
+quit:quit:quit:arrêter / quitter
+read:read:read:lire
+ride:rode:ridden:monter (à vélo / à cheval)
+ring:rang:rung:sonner
+rise:rose:risen:se lever (soleil / prix)
+run:ran:run:courir
+say:said:said:dire
+see:saw:seen:voir
+seek:sought:sought:chercher
+sell:sold:sold:vendre
+send:sent:sent:envoyer
+set:set:set:fixer / placer
+sew:sewed:sewn~sewed:coudre
+shake:shook:shaken:secouer
+shine:shone:shone:briller
+shoot:shot:shot:tirer (arme / photo)
+show:showed:shown~showed:montrer
+shrink:shrank:shrunk:rétrécir
+shut:shut:shut:fermer
+sing:sang:sung:chanter
+sink:sank:sunk:couler
+sit:sat:sat:s'asseoir
+sleep:slept:slept:dormir
+slide:slid:slid:glisser
+smell:smelt~smelled:smelt~smelled:sentir (une odeur)
+speak:spoke:spoken:parler
+spell:spelt~spelled:spelt~spelled:épeler
+spend:spent:spent:dépenser / passer (du temps)
+spill:spilt~spilled:spilt~spilled:renverser (un liquide)
+spin:spun:spun:tourner sur soi
+spit:spat:spat:cracher
+split:split:split:diviser / fendre
+spoil:spoilt~spoiled:spoilt~spoiled:gâcher
+spread:spread:spread:étaler / répandre
+spring:sprang:sprung:jaillir
+stand:stood:stood:être debout
+steal:stole:stolen:voler (dérober)
+stick:stuck:stuck:coller
+sting:stung:stung:piquer (insecte)
+stink:stank:stunk:puer
+strike:struck:struck:frapper / faire grève
+swear:swore:sworn:jurer
+sweep:swept:swept:balayer
+swim:swam:swum:nager
+swing:swung:swung:se balancer
+take:took:taken:prendre
+teach:taught:taught:enseigner
+tear:tore:torn:déchirer
+tell:told:told:raconter / dire à quelqu'un
+think:thought:thought:penser
+throw:threw:thrown:lancer
+understand:understood:understood:comprendre
+undertake:undertook:undertaken:entreprendre
+upset:upset:upset:contrarier
+wake:woke:woken:se réveiller / réveiller
+wear:wore:worn:porter (un vêtement)
+weep:wept:wept:sangloter
+win:won:won:gagner
+wind:wound:wound:enrouler / remonter (une montre)
+withdraw:withdrew:withdrawn:retirer
+write:wrote:written:écrire`.trim().split('\n').map(l=>{const p=l.split(':');return{b:p[0],p:p[1].split('~'),pp:p[2].split('~'),fr:p[3]}});
+const REG=`accept:accepted:accepter
+add:added:ajouter
+admire:admired:admirer
+agree:agreed:être d'accord
+allow:allowed:permettre
+answer:answered:répondre à
+apologise:apologised:s'excuser
+appear:appeared:apparaître
+arrive:arrived:arriver
+ask:asked:demander
+attack:attacked:attaquer
+avoid:avoided:éviter
+bake:baked:cuire au four
+believe:believed:croire
+belong:belonged:appartenir
+book:booked:réserver
+borrow:borrowed:emprunter
+brush:brushed:brosser
+call:called:appeler
+carry:carried:porter (transporter)
+change:changed:changer
+chat:chatted:bavarder
+check:checked:vérifier
+clean:cleaned:nettoyer
+climb:climbed:grimper
+close:closed:fermer
+collect:collected:ramasser / collectionner
+compare:compared:comparer
+complain:complained:se plaindre
+cook:cooked:cuisiner
+copy:copied:copier
+count:counted:compter
+cover:covered:couvrir
+cross:crossed:traverser
+cry:cried:pleurer
+dance:danced:danser
+decide:decided:décider
+deliver:delivered:livrer
+depend:depended:dépendre
+describe:described:décrire
+destroy:destroyed:détruire
+die:died:mourir
+discover:discovered:découvrir
+drop:dropped:laisser tomber
+enjoy:enjoyed:apprécier
+enter:entered:entrer
+explain:explained:expliquer
+fail:failed:échouer
+fill:filled:remplir
+finish:finished:finir
+fix:fixed:réparer / fixer
+follow:followed:suivre
+guess:guessed:deviner
+happen:happened:se passer / arriver
+hate:hated:détester
+help:helped:aider
+hope:hoped:espérer
+hurry:hurried:se dépêcher
+imagine:imagined:imaginer
+improve:improved:améliorer
+invite:invited:inviter
+join:joined:rejoindre
+jump:jumped:sauter
+kiss:kissed:embrasser
+knock:knocked:frapper (à la porte)
+laugh:laughed:rire
+lie:lied:mentir
+like:liked:aimer bien
+listen:listened:écouter
+live:lived:vivre / habiter
+look:looked:regarder
+love:loved:adorer
+marry:married:épouser
+miss:missed:manquer / rater
+move:moved:bouger / déménager
+need:needed:avoir besoin de
+notice:noticed:remarquer
+offer:offered:offrir / proposer
+open:opened:ouvrir
+order:ordered:commander
+pack:packed:faire ses bagages
+paint:painted:peindre
+park:parked:se garer
+pass:passed:passer / réussir
+phone:phoned:téléphoner
+pick:picked:cueillir / choisir
+plan:planned:planifier
+play:played:jouer
+prefer:preferred:préférer
+prepare:prepared:préparer
+pretend:pretended:faire semblant
+promise:promised:promettre
+pull:pulled:tirer
+push:pushed:pousser
+rain:rained:pleuvoir
+reach:reached:atteindre
+receive:received:recevoir
+recognise:recognised:reconnaître
+relax:relaxed:se détendre
+remember:remembered:se souvenir
+repair:repaired:réparer
+repeat:repeated:répéter
+reply:replied:répliquer
+rest:rested:se reposer
+return:returned:revenir / rendre
+rob:robbed:dévaliser
+save:saved:économiser / sauver
+seem:seemed:sembler
+shop:shopped:faire les courses
+shout:shouted:crier
+smile:smiled:sourire
+smoke:smoked:fumer
+snow:snowed:neiger
+start:started:commencer / démarrer
+stay:stayed:rester
+stop:stopped:arrêter
+study:studied:étudier
+succeed:succeeded:réussir
+suggest:suggested:suggérer
+surprise:surprised:surprendre
+talk:talked:parler / discuter
+taste:tasted:goûter
+thank:thanked:remercier
+tidy:tidied:ranger
+touch:touched:toucher
+train:trained:s'entraîner
+travel:travelled:voyager
+try:tried:essayer
+turn:turned:tourner
+use:used:utiliser
+visit:visited:visiter / rendre visite
+wait:waited:attendre
+walk:walked:marcher
+want:wanted:vouloir
+wash:washed:laver
+watch:watched:regarder (attentivement)
+wish:wished:souhaiter
+wonder:wondered:se demander
+work:worked:travailler
+worry:worried:s'inquiéter`.trim().split('\n').map(l=>l.split(':'));
+const vsafe=s=>s.replace(/[,=]/g,' /');
+V.push(["🔤","Verbes irréguliers (liste complète)",IRR_ALL.map(v=>vsafe(`${v.b} · ${v.p.join(' / ')} · ${v.pp.join(' / ')}`)+'='+vsafe(v.fr)).join(',')],
+["✅","Verbes réguliers",REG.map(r=>`${r[0]} · ${r[1]}=${vsafe(r[2])}`).join(',')]);
+const VN={'Verbes réguliers':`<p>Le prétérit et le participe passé sont identiques : verbe + <b>-ed</b>. Attention à l'orthographe : stop → stop<b>ped</b>, study → stud<b>ied</b>, travel → travel<b>led</b>, like → like<b>d</b>.</p>`,'Verbes irréguliers (liste complète)':`<p>Base · prétérit · participe passé. Quand deux formes existent (learnt / learned), les deux sont correctes. Entraîne-toi aussi dans Exercices › Verbes irréguliers.</p><p>Piège : <b>lie · lay · lain</b> = être allongé, mais <b>lie · lied</b> = mentir (régulier).</p>`};
+
+// ===== Section « Temps » : vue d'ensemble + conjugueur =====
+const VMAP={};
+IRR_ALL.forEach(v=>{VMAP[v.b]={p:v.p[0],pp:v.pp[0]}});
+REG.forEach(r=>{if(!VMAP[r[0]])VMAP[r[0]]={p:r[1],pp:r[1]}});
+const DBL=['begin','prefer','forget','occur','admit','refer','permit','upset','regret','control','quit','travel','commit','equip'];
+const dbl=v=>DBL.includes(v)||/^[^aeiou]*[aeiou][^aeiouwxy]$/.test(v);
+const ingf=v=>v==='be'?'being':/ie$/.test(v)?v.slice(0,-2)+'ying':/[^e]e$/.test(v)?v.slice(0,-1)+'ing':dbl(v)?v+v.slice(-1)+'ing':v+'ing';
+const edf=v=>/e$/.test(v)?v+'d':/[^aeiou]y$/.test(v)?v.slice(0,-1)+'ied':dbl(v)?v+v.slice(-1)+'ed':v+'ed';
+const s3f=v=>({have:'has',do:'does',go:'goes',be:'is'})[v]||(/(s|sh|ch|x|z|o)$/.test(v)?v+'es':/[^aeiou]y$/.test(v)?v.slice(0,-1)+'ies':v+'s');
+const up=s=>s[0].toUpperCase()+s.slice(1);
+function cj(S,v,t,m){
+ const f=VMAP[v]||{p:edf(v),pp:edf(v)},g=ingf(v),pp=v==='be'?'been':f.pp,past=f.p;
+ const th=['he','she','it'].includes(S),I=S==='I';
+ const be=I?'am':th?'is':'are',beN=I?'am not':th?"isn't":"aren't",was=I||th?'was':'were';
+ const has=th?'has':'have';
+ // forme générique : auxiliaire + reste
+ const ax=(a,an,rest)=>m==='a'?`${S} ${a} ${rest}`:m==='n'?`${S} ${an} ${rest}`:`${up(a)} ${S} ${rest}?`;
+ let r;
+ switch(t){
+  case 'ps':
+   if(v==='be'){r=m==='a'?`${S} ${be}`:m==='n'?`${S} ${beN}`:`${up(be)} ${S}?`;break}
+   r=m==='a'?`${S} ${th?s3f(v):v}`:m==='n'?`${S} ${th?"doesn't":"don't"} ${v}`:`${th?'Does':'Do'} ${S} ${v}?`;break;
+  case 'pc':r=ax(be,beN,g);break;
+  case 'pp':r=ax(has,has+"n't",pp);break;
+  case 'ppc':r=ax(has,has+"n't",'been '+g);break;
+  case 'pas':
+   if(v==='be'){r=m==='a'?`${S} ${was}`:m==='n'?`${S} ${was}n't`:`${up(was)} ${S}?`;break}
+   r=m==='a'?`${S} ${past}`:m==='n'?`${S} didn't ${v}`:`Did ${S} ${v}?`;break;
+  case 'pasc':r=ax(was,was+"n't",g);break;
+  case 'pf':r=ax('had',"hadn't",pp);break;
+  case 'pfc':r=ax('had',"hadn't",'been '+g);break;
+  case 'ut':r=m==='a'?`${S} used to ${v}`:m==='n'?`${S} didn't use to ${v}`:`Did ${S} use to ${v}?`;break;
+  case 'wl':r=ax('will',"won't",v);break;
+  case 'gt':r=ax(be,beN,'going to '+v);break;
+  case 'fc':r=ax('will',"won't",'be '+g);break;
+  case 'fp':r=ax('will',"won't",'have '+pp);break;
+  case 'cd':r=ax('would',"wouldn't",v);break;
+  case 'cdp':r=ax('would',"wouldn't",'have '+pp);break;
+ }
+ r=up(r);return m==='q'||r.endsWith('?')?r:r+'.';
+}
+const TN=[
+{id:'ps',g:'Présent',en:'Present simple',fr:'Présent',u:'Habitudes, vérités générales, horaires, goûts et états.',k:'always, usually, often, every day, never',x:'She works in a bank.',fi:'Présent simple'},
+{id:'pc',g:'Présent',en:'Present continuous',fr:'Présent (« être en train de »)',u:'Action en cours maintenant, situation temporaire, rendez-vous déjà organisé.',k:'now, at the moment, today, Look!, Listen!',x:"I'm working right now.",fi:'Présent continu'},
+{id:'pp',g:'Présent',en:'Present perfect',fr:'Passé composé (lié au présent)',u:"Expérience de vie, résultat visible maintenant, action très récente, période pas terminée.",k:'ever, never, just, already, yet, this week, since, for',x:"I've lost my keys.",fi:'Present perfect'},
+{id:'ppc',g:'Présent',en:'Present perfect continuous',fr:'Présent + « depuis »',u:"Activité qui dure jusqu'à maintenant, ou qui vient de s'arrêter avec un résultat visible.",k:'for, since, all day, lately, how long',x:"I've been waiting for an hour.",fi:'Present perfect continu'},
+{id:'pas',g:'Passé',en:'Past simple',fr:'Passé composé / passé simple',u:'Action terminée à un moment précis du passé.',k:'yesterday, last week, ago, in 2010, when I was young',x:'I worked late yesterday.',fi:'Passé simple réguliers'},
+{id:'pasc',g:'Passé',en:'Past continuous',fr:'Imparfait (« être en train de »)',u:'Action en cours à un moment du passé, souvent interrompue par une autre.',k:'while, when, at 8 o\'clock yesterday',x:'I was working when he called.',fi:'Passé continu et used to'},
+{id:'pf',g:'Passé',en:'Past perfect',fr:'Plus-que-parfait',u:'Action qui a eu lieu avant une autre action passée.',k:'already, before, after, by the time, never… before',x:'The film had started when I arrived.',fi:'Past perfect'},
+{id:'pfc',g:'Passé',en:'Past perfect continuous',fr:'Plus-que-parfait (durée)',u:"Durée d'une activité avant un moment du passé.",k:'for, since, all day (+ récit au passé)',x:'She was tired because she had been working all day.',fi:'Past perfect continu'},
+{id:'ut',g:'Passé',en:'Used to',fr:"Imparfait d'habitude",u:"Habitude ou état passé qui n'existe plus aujourd'hui.",k:'when I was a child, before, in the past',x:'I used to play football every Saturday.',fi:'Used to / be used to / get used to'},
+{id:'wl',g:'Futur',en:'Future with will',fr:'Futur simple',u:'Décision prise sur le moment, prédiction, promesse, offre.',k:'tomorrow, next year, I think, probably, soon',x:"I'll help you, don't worry.",fi:'Futur : will / going to'},
+{id:'gt',g:'Futur',en:'Be going to',fr:'Futur proche (« aller » + infinitif)',u:'Intention déjà décidée, prédiction basée sur ce que l\'on voit.',k:'tonight, next week, Look at the clouds!',x:"I'm going to work abroad next year.",fi:'Futur : will / going to'},
+{id:'fc',g:'Futur',en:'Future continuous',fr:'Futur (« être en train de »)',u:'Action en cours à un moment précis du futur.',k:'this time tomorrow, at 8 tomorrow, next week at this time',x:"This time tomorrow, I'll be working.",fi:'Futur continu et futur antérieur'},
+{id:'fp',g:'Futur',en:'Future perfect',fr:'Futur antérieur',u:'Action terminée avant un moment du futur.',k:'by, by the time, by next year',x:"I'll have finished by 6.",fi:'Futur continu et futur antérieur'},
+{id:'cd',g:'Conditionnel',en:'Conditional (would)',fr:'Conditionnel présent',u:'Situation imaginaire, demande polie, souhait.',k:'if + passé simple, I would like',x:'I would work less if I were rich.',fi:'Conditionnel 2 (irréel)'},
+{id:'cdp',g:'Conditionnel',en:'Conditional perfect (would have)',fr:'Conditionnel passé',u:'Situation passée imaginaire, regret, reproche.',k:'if + past perfect',x:'I would have worked harder if I had known.',fi:'Conditionnel 3 et wish'}
+];
+const TGR=['Présent','Passé','Futur','Conditionnel'];
+const TSER=['Présent simple','Présent continu','Présent simple ou continu','Passé simple réguliers','Passé simple irréguliers','Passé : négation et question','Futur : will / going to','Present perfect','Present perfect ou passé simple','Passé continu et used to','Past perfect','Present perfect continu','Past perfect continu','Futur continu et futur antérieur','Le présent pour parler du futur','Conditionnel 2 (irréel)','Conditionnel 3 et wish'];
+const fidx=t=>D.findIndex(d=>d[1]===t);
+let tg='Tout',cjv='go',cjs='I',cjm='a';
+function thome(){
+ setSec('tps');
+ const vl=Object.keys(VMAP).sort();
+ let h=`<h1>Les temps</h1><p>Tous les temps de l'anglais, du présent au conditionnel, avec un conjugueur pour voir n'importe quel verbe à tous les temps.</p>
+ <h2>🧮 Conjugueur</h2><div class="q"><div class="cjf"><label>Verbe<input id="cv" list="vlist" value="${cjv}" autocomplete="off" autocapitalize="off"></label><label>Sujet<select id="cs">${['I','you','he','she','it','we','they'].map(s=>`<option ${s===cjs?'selected':''}>${s}</option>`).join('')}</select></label></div><datalist id="vlist">${vl.map(v=>`<option value="${v}">`).join('')}</datalist>
+ <div class="chips" style="margin-top:12px" id="cm">${[['a','Affirmatif'],['n','Négatif'],['q','Question']].map(([k,l])=>`<button aria-pressed="${k===cjm}" data-m="${k}">${l}</button>`).join('')}</div><div id="cout"></div></div>
+ <p style="margin-top:14px"><button class="go" id="tmix">Test mixte : tous les temps (20 questions)</button></p>
+ <h2>📚 Les temps un par un</h2><div class="chips">${['Tout',...TGR].map(g=>`<button aria-pressed="${g===tg}" data-g="${g}">${g}</button>`).join('')}</div>`;
+ TGR.filter(g=>tg==='Tout'||g===tg).forEach(g=>{
+  h+=`<h2><span class="lv tg-${g==='Présent'?'pr':g==='Passé'?'pa':g==='Futur'?'fu':'co'}">${g}</span></h2>`;
+  TN.filter(t=>t.g===g).forEach(t=>{const fi=fidx(t.fi);
+   h+=`<div class="q th tcard"><h3 style="margin-top:0">${t.en}</h3><p><b>En français :</b> ${t.fr}</p>${tb(['','I','she'],[['Affirmatif',e(cj('I','work',t.id,'a')),e(cj('she','work',t.id,'a'))],['Négatif',e(cj('I','work',t.id,'n')),e(cj('she','work',t.id,'n'))],['Question',e(cj('I','work',t.id,'q')),e(cj('she','work',t.id,'q'))]])}<p><b>Quand :</b> ${t.u}</p><p><b>Mots repères :</b> <i>${t.k}</i></p><p><b>Exemple :</b> ${e(t.x)}</p>${fi>=0?`<p style="margin-top:10px"><button class="go" data-th="${fi}">Fiche de cours</button> <button class="back" data-ex="${fi}" style="margin:0 0 0 6px">S'entraîner</button></p>`:''}</div>`});
+ });
+ h+=`<h2>🤔 Quel temps choisir ?</h2><div class="q th">${tb(['Je veux parler…','Temps','Exemple'],[["d'une habitude",'Present simple',e('I play tennis on Mondays.')],["de ce qui se passe maintenant",'Present continuous',e("I'm playing tennis now.")],["d'une expérience, sans date",'Present perfect',e("I've played in Paris.")],["d'un moment précis du passé",'Past simple',e('I played yesterday.')],["d'une action en cours dans le passé",'Past continuous',e('I was playing when it rained.')],["d'une action avant une autre (passé)",'Past perfect',e('I had played before lunch.')],["d'une décision soudaine",'Will',e("I'll play with you!")],["d'un projet déjà décidé",'Going to',e("I'm going to play on Sunday.")],["de quelque chose d'imaginaire",'Would',e('I would play if I had time.')]])}</div>`;
+ app.innerHTML=h;
+ const out=document.getElementById('cout'),cv=document.getElementById('cv'),cs=document.getElementById('cs');
+ function draw(){
+  const v=norm(cv.value||'').replace(/^to /,'');
+  if(!/^[a-z]+$/.test(v)){out.innerHTML='<p>Écris un verbe en anglais (ex. : go, work, take).</p>';return}
+  cjv=v;cjs=cs.value;
+  const known=VMAP[v]||v==='be';
+  out.innerHTML=(known?'':`<p style="color:var(--ko)">Verbe absent de la liste : formes régulières supposées (+ -ed).</p>`)+`<div class="th">${TGR.map(g=>`<h3>${g}</h3>`+tb(['Temps','Forme',''],TN.filter(t=>t.g===g).map(t=>{const s=cj(cjs,v,t.id,cjm);return[`${t.en}<br><small style="color:var(--mute)">${t.fr}</small>`,e(s),`<button class="sp" data-say="${s.replace(/"/g,'')}" aria-label="Écouter">🔊</button>`]}))).join('')}</div>`;
+  out.querySelectorAll('[data-say]').forEach(b=>b.onclick=()=>{if('speechSynthesis' in window){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(b.dataset.say);u.lang='en-GB';speechSynthesis.speak(u)}});
+ }
+ cv.oninput=draw;cs.onchange=draw;
+ app.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{cjm=b.dataset.m;app.querySelectorAll('[data-m]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.m===cjm));draw()});
+ draw();
+ app.querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>{tg=b.dataset.g;thome()});
+ app.querySelectorAll('[data-th]').forEach(b=>b.onclick=()=>theory(+b.dataset.th));
+ app.querySelectorAll('[data-ex]').forEach(b=>b.onclick=()=>{const i=+b.dataset.ex;run(D[i][1],shuf(D[i][2]).map(parse),i)});
+ document.getElementById('tmix').onclick=()=>run('Test mixte : les temps',shuf(TSER.map(fidx).filter(i=>i>=0).flatMap(i=>D[i][2].map(x=>[x,i]))).slice(0,20).map(([x,i])=>({...parse(x),t:i})),-1);
+}
 
 const R=[
 ["A1","My name is Lisa","My name is Lisa. I am 12 years old. I am from Belgium. I live in a small house with my mother, my father and my brother. I have a cat. Her name is Mimi.",["Quel âge a Lisa ?|12 ans|10 ans/12 ans/15 ans|I am 12 years old","Qui est Mimi ?|Son chat|Sa sœur/Son chat/Sa mère|I have a cat. Her name is Mimi"]],
