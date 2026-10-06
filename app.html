@@ -72,7 +72,9 @@ nav button[aria-selected=true]{background:linear-gradient(135deg,var(--acc),var(
 .back{background:var(--card);border-radius:99px;padding:7px 16px;box-shadow:var(--sh)}
 .th h3{display:inline-block;border:0;padding:5px 14px;background:color-mix(in srgb,var(--acc) 15%,transparent);color:var(--acc);border-radius:99px;font-weight:800}
 .th .sc{border-radius:12px;box-shadow:0 0 0 1px var(--line);margin:8px 0}.th table{margin:0}
-.th th{background:linear-gradient(90deg,var(--acc),var(--p2))}
+.th th{background:color-mix(in srgb,var(--acc) 13%,var(--card));color:var(--acc);font-weight:800;font-size:.85rem;letter-spacing:.02em;padding:10px 12px;border-bottom:2px solid color-mix(in srgb,var(--acc) 30%,transparent)}
+.th table{line-height:1.45;font-size:.92rem}.th td{padding:10px 12px;vertical-align:middle}
+@media (max-width:480px){.q{padding:16px}.th td,.th th{padding:9px 9px}}
 .th tr:nth-child(even) td{background:color-mix(in srgb,var(--acc) 6%,transparent)}
 .th .box{border:0;border-radius:14px;background:color-mix(in srgb,var(--acc) 8%,var(--card))}
 .th .warn{background:color-mix(in srgb,var(--ko) 10%,var(--card));border-left:6px solid var(--ko)}
@@ -89,8 +91,26 @@ details.q summary{cursor:pointer;font-weight:800;color:var(--acc)}
 .ans button{border-color:var(--acc)}.ans .ph{color:var(--mute)}.ans .pt{font-weight:800;font-size:1.2rem}
 .cjf{display:flex;gap:12px;flex-wrap:wrap}.cjf label{display:flex;flex-direction:column;gap:4px;font-weight:800;color:var(--mute);flex:1;min-width:130px}
 .cjf select{font:inherit;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:8px;padding:9px 12px}.q .cjf input{max-width:none}
-.lv.tg-pr{background:#12b886}.lv.tg-pa{background:#e17055}.lv.tg-fu{background:#0984e3}.lv.tg-co{background:#8e44ad}
+.lv.tg-pr{background:#0b8a63}.lv.tg-pa{background:#c2550f}.lv.tg-fu{background:#0973c6}.lv.tg-co{background:#6a48f0}
 .tcard p{color:var(--ink)}
+
+/* Code couleur cohérent :
+   - couleur du tableau = couleur du niveau (A1 vert, A2 orange, B1 violet, B2 rose, C1 bleu, C2 or)
+     ou du groupe de temps (Présent vert, Passé orange, Futur bleu, Conditionnel violet)
+   - anglais = bleu partout ; français = texte normal ; erreur = rouge ; astuce = vert */
+:root{--hc:#6c5ce7;--en:#0b6fd0}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--en:#7cc0ff}}
+:root[data-theme="dark"]{--en:#7cc0ff}
+.en{color:var(--en)}
+.lvc-A1,.tgc-pr{--hc:#0b8a63}.lvc-A2,.tgc-pa{--hc:#c2550f}.lvc-B1,.tgc-co{--hc:#6a48f0}.lvc-B2{--hc:#c2255c}.lvc-C1,.tgc-fu{--hc:#0973c6}.lvc-C2{--hc:#8f6700}
+.th .sc{box-shadow:0 0 0 2px color-mix(in srgb,var(--hc) 35%,transparent)}
+.th .sc th{background:var(--hc);color:#fff;font-size:.9rem;border-bottom:0}
+.th .sc tr:nth-child(even) td{background:color-mix(in srgb,var(--hc) 9%,transparent)}
+.th .sc td{border-bottom:1px solid color-mix(in srgb,var(--hc) 18%,transparent)}
+.th .sc td:first-child{font-weight:800}
+.th h3{background:color-mix(in srgb,var(--hc) 15%,transparent);color:color-mix(in srgb,var(--hc) 72%,var(--ink))}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.85rem;font-weight:700;margin:8px 0 4px;color:var(--mute)}
+.legend span{display:inline-flex;align-items:center;gap:5px}.legend i{width:12px;height:12px;border-radius:4px;display:inline-block}
 </style></head><body><nav id="nav"><button data-n="theo"><i>📘</i>Théorie</button><button data-n="tps"><i>⏳</i>Temps</button><button data-n="exo"><i>✏️</i>Exercices</button><button data-n="voc"><i>🗂️</i>Vocabulaire</button><button data-n="lec"><i>📖</i>Lecture</button></nav><main id="app"></main>
 <script>
 const D=[
@@ -263,8 +283,8 @@ function review(m){
   h+=`<div class="q"><div class="s">${x.q.q.replace('___','<b>_____</b>')}</div>
   <p>Ta réponse : <span class="k">${x.given||'(vide)'}</span><br>Bonne réponse : <span class="g">${x.q.a[0]}</span></p>
   <p>Phrase correcte : <span class="en">${ok}</span></p>
-  <div class="th"><h3>Extrait de la fiche « ${d[1]} » (${d[0]})</h3>${h3&&t?'<p><b>'+h3.textContent+'</b></p>':''}${t?t.parentNode.outerHTML:''}${k?k.outerHTML:''}</div>
-  <details><summary>Relire toute la fiche</summary><div class="th">${TH[x.ti]}</div></details></div>`;
+  <div class="th lvc-${d[0]}"><h3>Extrait de la fiche « ${d[1]} » (${d[0]})</h3>${h3&&t?'<p><b>'+h3.textContent+'</b></p>':''}${t?t.parentNode.outerHTML:''}${k?k.outerHTML:''}</div>
+  <details><summary>Relire toute la fiche</summary><div class="th lvc-${d[0]}">${TH[x.ti]}</div></details></div>`;
  });
  return h+'</div>';
 }
@@ -351,7 +371,7 @@ function vhome(){
 }
 function vtheme(i){
  const w=vp(i);
- app.innerHTML=`<button class="back" id="bk">← Vocabulaire</button><h1>${V[i][0]} ${V[i][1]}</h1>${VN[V[i][1]]||''}<div class="q th"><div class="sc"><table><tr><th>English</th><th>Français</th><th></th></tr>${w.map(x=>`<tr><td class="en">${x.en}</td><td>${x.fr}</td><td><button class="sp" data-w="${x.en}" aria-label="Écouter ${x.en}">🔊</button></td></tr>`).join('')}</table></div></div><p style="margin-top:16px"><button class="go" id="vt">Se tester (10 mots)</button></p>`;
+ app.innerHTML=`<button class="back" id="bk">← Vocabulaire</button><h1>${V[i][0]} ${V[i][1]}</h1>${VN[V[i][1]]||''}<div class="q th" style="--hc:hsl(${i*47} 70% 36%)"><div class="sc"><table><tr><th>English</th><th>Français</th><th></th></tr>${w.map(x=>`<tr><td class="en">${x.en}</td><td>${x.fr}</td><td><button class="sp" data-w="${x.en}" aria-label="Écouter ${x.en}">🔊</button></td></tr>`).join('')}</table></div></div><p style="margin-top:16px"><button class="go" id="vt">Se tester (10 mots)</button></p>`;
  document.getElementById('bk').onclick=vhome;
  document.getElementById('vt').onclick=()=>vquiz(V[i][1],w,'v'+i);
  app.querySelectorAll('.sp').forEach(b=>b.onclick=()=>{if('speechSynthesis' in window){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(b.dataset.w.replace(/^to /,'').replace(/[·\/]/g,','));u.lang='en-GB';speechSynthesis.speak(u)}});
@@ -1017,7 +1037,7 @@ function thome(){
  TGR.filter(g=>tg==='Tout'||g===tg).forEach(g=>{
   h+=`<h2><span class="lv tg-${g==='Présent'?'pr':g==='Passé'?'pa':g==='Futur'?'fu':'co'}">${g}</span></h2>`;
   TN.filter(t=>t.g===g).forEach(t=>{const fi=fidx(t.fi);
-   h+=`<div class="q th tcard"><h3 style="margin-top:0">${t.en}</h3><p><b>En français :</b> ${t.fr}</p>${tb(['','I','she'],[['Affirmatif',e(cj('I','work',t.id,'a')),e(cj('she','work',t.id,'a'))],['Négatif',e(cj('I','work',t.id,'n')),e(cj('she','work',t.id,'n'))],['Question',e(cj('I','work',t.id,'q')),e(cj('she','work',t.id,'q'))]])}<p><b>Quand :</b> ${t.u}</p><p><b>Mots repères :</b> <i>${t.k}</i></p><p><b>Exemple :</b> ${e(t.x)}</p>${fi>=0?`<p style="margin-top:10px"><button class="go" data-th="${fi}">Fiche de cours</button> <button class="back" data-ex="${fi}" style="margin:0 0 0 6px">S'entraîner</button></p>`:''}</div>`});
+   h+=`<div class="q th tcard tgc-${g==='Présent'?'pr':g==='Passé'?'pa':g==='Futur'?'fu':'co'}"><h3 style="margin-top:0">${t.en}</h3><p><b>En français :</b> ${t.fr}</p>${tb(['','I','she'],[['Affirmatif',e(cj('I','work',t.id,'a')),e(cj('she','work',t.id,'a'))],['Négatif',e(cj('I','work',t.id,'n')),e(cj('she','work',t.id,'n'))],['Question',e(cj('I','work',t.id,'q')),e(cj('she','work',t.id,'q'))]])}<p><b>Quand :</b> ${t.u}</p><p><b>Mots repères :</b> <i>${t.k}</i></p><p><b>Exemple :</b> ${e(t.x)}</p>${fi>=0?`<p style="margin-top:10px"><button class="go" data-th="${fi}">Fiche de cours</button> <button class="back" data-ex="${fi}" style="margin:0 0 0 6px">S'entraîner</button></p>`:''}</div>`});
  });
  h+=`<h2>🤔 Quel temps choisir ?</h2><div class="q th">${tb(['Je veux parler…','Temps','Exemple'],[["d'une habitude",'Present simple',e('I play tennis on Mondays.')],["de ce qui se passe maintenant",'Present continuous',e("I'm playing tennis now.")],["d'une expérience, sans date",'Present perfect',e("I've played in Paris.")],["d'un moment précis du passé",'Past simple',e('I played yesterday.')],["d'une action en cours dans le passé",'Past continuous',e('I was playing when it rained.')],["d'une action avant une autre (passé)",'Past perfect',e('I had played before lunch.')],["d'une décision soudaine",'Will',e("I'll play with you!")],["d'un projet déjà décidé",'Going to',e("I'm going to play on Sunday.")],["de quelque chose d'imaginaire",'Would',e('I would play if I had time.')]])}</div>`;
  app.innerHTML=h;
@@ -1027,7 +1047,7 @@ function thome(){
   if(!/^[a-z]+$/.test(v)){out.innerHTML='<p>Écris un verbe en anglais (ex. : go, work, take).</p>';return}
   cjv=v;cjs=cs.value;
   const known=VMAP[v]||v==='be';
-  out.innerHTML=(known?'':`<p style="color:var(--ko)">Verbe absent de la liste : formes régulières supposées (+ -ed).</p>`)+`<div class="th">${TGR.map(g=>`<h3>${g}</h3>`+tb(['Temps','Forme',''],TN.filter(t=>t.g===g).map(t=>{const s=cj(cjs,v,t.id,cjm);return[`${t.en}<br><small style="color:var(--mute)">${t.fr}</small>`,e(s),`<button class="sp" data-say="${s.replace(/"/g,'')}" aria-label="Écouter">🔊</button>`]}))).join('')}</div>`;
+  out.innerHTML=(known?'':`<p style="color:var(--ko)">Verbe absent de la liste : formes régulières supposées (+ -ed).</p>`)+`<div class="th">${TGR.map(g=>`<div class="tgc-${g==='Présent'?'pr':g==='Passé'?'pa':g==='Futur'?'fu':'co'}"><h3>${g}</h3>`+tb(['Temps','Forme',''],TN.filter(t=>t.g===g).map(t=>{const s=cj(cjs,v,t.id,cjm);return[`${t.en}<br><small style="color:var(--mute)">${t.fr}</small>`,e(s),`<button class="sp" data-say="${s.replace(/"/g,'')}" aria-label="Écouter">🔊</button>`]}))+'</div>').join('')}</div>`;
   out.querySelectorAll('[data-say]').forEach(b=>b.onclick=()=>{if('speechSynthesis' in window){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(b.dataset.say);u.lang='en-GB';speechSynthesis.speak(u)}});
  }
  cv.oninput=draw;cs.onchange=draw;
@@ -1092,7 +1112,7 @@ function ltext(i){
 }
 function theory(i){
  const d=D[i];setSec('theo');
- app.innerHTML=`<button class="back" id="bk">← Catalogue</button><p>Niveau ${d[0]}</p><h1>${d[1]}</h1><div class="q th">${TH[i]}</div><p style="margin-top:16px"><button class="go" id="st">S'entraîner (${d[2].length} questions)</button></p>`;
+ app.innerHTML=`<button class="back" id="bk">← Catalogue</button><p><span class="lv l-${d[0]}">${d[0]}</span></p><h1>${d[1]}</h1><div class="lvc-${d[0]}"><div class="legend"><span><i style="background:var(--en)"></i>anglais</span><span><i style="background:var(--ko)"></i>erreur à éviter</span><span><i style="background:var(--ok)"></i>astuce</span><span><i style="background:var(--hc)"></i>couleur du niveau</span></div></div><div class="q th lvc-${d[0]}">${TH[i]}</div><p style="margin-top:16px"><button class="go" id="st">S'entraîner (${d[2].length} questions)</button></p>`;
  document.getElementById('bk').onclick=home;
  document.getElementById('st').onclick=()=>run(d[1],shuf(d[2]).map(parse),i);
  window.scrollTo(0,0);
